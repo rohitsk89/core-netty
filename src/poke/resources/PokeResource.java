@@ -42,7 +42,7 @@ public class PokeResource implements Resource {
 		// TODO add code to process the message/event received
 		
 		logger.info("poke: " + request.getBody().getFinger().getTag());
-		System.out.println("#########Inside Forward Request Process function#######");
+		//System.out.println("#########Inside Forward Request Process function#######");
 		Response.Builder rb = Response.newBuilder();
 
 		// metadata

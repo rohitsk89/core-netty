@@ -104,9 +104,11 @@ public class ClientConnection {
 			byte[] data = Files.readAllBytes(path);
 			d.setChunkContent(ByteString.copyFrom(data));
 			d.setChunkId(001);
-			d.setDocName(filepath);
+			//d.setDocName(filepath);
 			d.setDocSize(1);
 			d.setTotalChunk(1);
+			String[] filename = filepath.split("/");
+			d.setDocName(filename[filename.length-1]);
 		}
 		catch (IOException e)
 		{

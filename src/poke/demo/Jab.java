@@ -32,12 +32,12 @@ public class Jab {
 		ClientListener listener = new ClientPrintListener("jab demo");
 		cc.addListener(listener);
 
-		for (int i = 0; i < 3; i++) {
+		//for (int i = 0; i < 3; i++) {
 			count++;
 			System.out.println("tag ="+tag);
 			System.out.println("count ="+count);
 			cc.poke("/home/virajh/hello.txt", tag, count);
-		}
+		//}
 	}
 
 	public static void main(String[] args) {
