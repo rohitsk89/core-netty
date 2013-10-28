@@ -51,11 +51,11 @@ public class ResourceFactory {
 	public static void initialize(ServerConf cfg) {
 		try {
 			ResourceFactory.cfg = cfg;
-			cfg.addResource(new ResourceConf(20, "document.add", "poke.resources.DocumentResource"));
+			//cfg.addResource(new ResourceConf(20, "document.add", "poke.resources.DocumentResource"));
 			//cfg.addResource(new ResourceConf(21, "document.find", "poke.resources.DocumentResource"));
-			cfg.addResource(new ResourceConf(22, "document.update", "poke.resources.DocumentResource"));
-			cfg.addResource(new ResourceConf(23, "document.remove", "poke.resources.DocumentResource"));
-			cfg.addResource(new ResourceConf(24, "document.addhandshake", "poke.resources.DocumentResource"));
+			//cfg.addResource(new ResourceConf(22, "document.update", "poke.resources.DocumentResource"));
+			//cfg.addResource(new ResourceConf(23, "document.remove", "poke.resources.DocumentResource"));
+			//cfg.addResource(new ResourceConf(24, "document.addhandshake", "poke.resources.DocumentResource"));
 
 			factory.compareAndSet(null, new ResourceFactory());
 		} catch (Exception e) {
