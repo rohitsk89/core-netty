@@ -90,21 +90,15 @@ public class ClientConnection {
 			logger.error("failed to add listener", e);
 		}
 	}
-
-	public void poke(String filepath, String tag, int num) {
-		// data to send
-		Finger.Builder f = eye.Comm.Finger.newBuilder();
-		f.setTag(tag);
-		f.setNumber(num);
-		//System.out.println("inside poke");
-		
+	
+	public void docAdd(String filepath, String originator)
+	{
 		Document.Builder d = eye.Comm.Document.newBuilder();
 		try {
 			Path path = Paths.get(filepath);
 			byte[] data = Files.readAllBytes(path);
 			d.setChunkContent(ByteString.copyFrom(data));
 			d.setChunkId(001);
-			//d.setDocName(filepath);
 			d.setDocSize(1);
 			d.setTotalChunk(1);
 			String[] filename = filepath.split("/");
@@ -114,11 +108,43 @@ public class ClientConnection {
 		{
 			logger.warn("Unable to read file "+filepath);
 		}
-		
+
 		// payload containing data
 		Request.Builder r = Request.newBuilder();
 		eye.Comm.Payload.Builder p = Payload.newBuilder();
 		p.setDoc(d.build());
+		r.setBody(p.build());
+
+		// header with routing info
+		eye.Comm.Header.Builder h = Header.newBuilder();
+		h.setOriginator(originator);
+
+		h.setTime(System.currentTimeMillis());
+		h.setRoutingId(eye.Comm.Header.Routing.DOCADD);
+		h.setToNode("zero");
+		r.setHeader(h.build());
+
+		eye.Comm.Request req = r.build();
+		
+		try {
+			// enqueue message
+			System.out.println("Req -> " + req);
+			outbound.put(req);
+		} catch (InterruptedException e) {
+			logger.warn("Unable to deliver message, queuing");
+		}
+	}
+
+	public void poke(String tag, int num) {
+		// data to send
+		Finger.Builder f = eye.Comm.Finger.newBuilder();
+		f.setTag(tag);
+		f.setNumber(num);
+		//System.out.println("inside poke");
+		
+		// payload containing data
+		Request.Builder r = Request.newBuilder();
+		eye.Comm.Payload.Builder p = Payload.newBuilder();
 		p.setFinger(f.build());
 		r.setBody(p.build());
 
@@ -127,7 +153,7 @@ public class ClientConnection {
 		h.setOriginator("client");
 		h.setTag("test finger");
 		h.setTime(System.currentTimeMillis());
-		h.setRoutingId(eye.Comm.Header.Routing.DOCADD);
+		h.setRoutingId(eye.Comm.Header.Routing.FINGER);
 		h.setToNode("zero");
 		r.setHeader(h.build());
 
