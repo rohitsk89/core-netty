@@ -212,7 +212,6 @@ public class PerChannelQueue implements ChannelQueue {
 
 		public InboundWorker(ThreadGroup tgrp, int workerId, PerChannelQueue sq) {
 			super(tgrp, "inbound-" + workerId);
-			System.out.println("Worker ID -----#######--------" + workerId);
 			this.workerId = workerId;
 			this.sq = sq;
 
@@ -241,27 +240,27 @@ public class PerChannelQueue implements ChannelQueue {
 						Request req = ((Request) msg);
 
 						// do we need to route the request?
-						System.out.println("#####Inside msg instanceof Request######");
 						// handle it locally
-						Resource rsc = ResourceFactory.getInstance().resourceInstance(req.getHeader());
 						
+						Resource rsc = ResourceFactory.getInstance().resourceInstance(req.getHeader());
 						Response reply = null;
+						
 						if (rsc == null) {
 							logger.error("failed to obtain resource for " + req);
 							reply = ResourceUtil.buildError(req.getHeader(), ReplyStatus.FAILURE,
 									"Request not processed");
 						} else {
-							System.out.println("#####Before Processing a request for reply######" + rsc.getClass());
+							//System.out.println(">_>_>_> "+rsc.getClass());
 							reply = rsc.process(req);
 						}
 						sq.enqueueResponse(reply);
 					}
 
 				} catch (InterruptedException ie) {
-					System.out.println("####error in processing - interruptedException####");
+					ie.printStackTrace(System.out);
 					break;
 				} catch (Exception e) {
-					System.out.println("####error in processing####");
+					System.out.println(e.getMessage());
 					PerChannelQueue.logger.error("Unexpected processing failure", e);
 					break;
 				}

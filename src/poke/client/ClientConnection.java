@@ -15,7 +15,11 @@
  */
 package poke.client;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -27,7 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.ByteString;
 
+import eye.Comm.Document;
 import eye.Comm.Finger;
 import eye.Comm.Header;
 import eye.Comm.Payload;
@@ -85,15 +91,32 @@ public class ClientConnection {
 		}
 	}
 
-	public void poke(String tag, int num) {
+	public void poke(String filepath, String tag, int num) {
 		// data to send
 		Finger.Builder f = eye.Comm.Finger.newBuilder();
 		f.setTag(tag);
 		f.setNumber(num);
-		System.out.println("inside poke");
+		//System.out.println("inside poke");
+		
+		Document.Builder d = eye.Comm.Document.newBuilder();
+		try {
+			Path path = Paths.get(filepath);
+			byte[] data = Files.readAllBytes(path);
+			d.setChunkContent(ByteString.copyFrom(data));
+			d.setChunkId(001);
+			d.setDocName(filepath);
+			d.setDocSize(1);
+			d.setTotalChunk(1);
+		}
+		catch (IOException e)
+		{
+			logger.warn("Unable to read file "+filepath);
+		}
+		
 		// payload containing data
 		Request.Builder r = Request.newBuilder();
 		eye.Comm.Payload.Builder p = Payload.newBuilder();
+		p.setDoc(d.build());
 		p.setFinger(f.build());
 		r.setBody(p.build());
 
@@ -102,7 +125,8 @@ public class ClientConnection {
 		h.setOriginator("client");
 		h.setTag("test finger");
 		h.setTime(System.currentTimeMillis());
-		h.setRoutingId(eye.Comm.Header.Routing.FINGER);
+		h.setRoutingId(eye.Comm.Header.Routing.DOCADD);
+		h.setToNode("zero");
 		r.setHeader(h.build());
 
 		eye.Comm.Request req = r.build();

@@ -37,6 +37,7 @@ public class PokeResource implements Resource {
 	 * 
 	 * @see poke.server.resources.Resource#process(eye.Comm.Finger)
 	 */
+	
 	public Response process(Request request) {
 		// TODO add code to process the message/event received
 		

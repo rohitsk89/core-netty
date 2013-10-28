@@ -15,7 +15,10 @@
  */
 package poke.resources;
 
+import java.io.File;
+
 import poke.server.resources.Resource;
+import eye.Comm.Document;
 import eye.Comm.Request;
 import eye.Comm.Response;
 
@@ -23,8 +26,44 @@ public class DocumentResource implements Resource {
 
 	@Override
 	public Response process(Request request) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		int action = request.getHeader().getRoutingId().getNumber();
+		Response res = null;
+		
+		switch(action) {
+		
+		case 20:
+			System.out.println("DOCUMENT UPLOAD");
+			docAdd(request);
+			break;
+		case 21:
+			System.out.println("DOCUMENT FIND");
+			break;
+		case 22:
+			System.out.println("DOCUMENT UPDATE");
+			break;
+		case 23:
+			System.out.println("DOCUMENT REMOVE");
+			break;
+		case 24:
+			System.out.println("DOCUMENT HANDSHAKE");
+			break;
+		
+		}
+//        DOCADD = 20;
+//        DOCFIND = 21;
+//        DOCUPDATE = 22;
+//        DOCREMOVE = 23;
+//        DOCADDHANDSHAKE = 24;
+
+		return res;
+	}
+	
+	private void docAdd(Request request)
+	{
+		Document doc = request.getBody().getDoc();
+		System.out.println(new String(doc.getChunkContent().toByteArray()));
+		File file;
 	}
 
 }

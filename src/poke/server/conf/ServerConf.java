@@ -47,17 +47,19 @@ public class ServerConf {
 
 		if (idToRsc == null) {
 			synchronized (this) {
+
 				if (idToRsc == null) {
 					idToRsc = new HashMap<Integer, ResourceConf>();
 					if (routing != null) {
 						for (ResourceConf entry : routing) {
 							idToRsc.put(entry.id, entry);
+							System.out.println(entry.id+" => "+entry.getName()+" "+entry.getClazz());
 						}
 					}
 				}
 			}
 		}
-
+		System.out.println(">_<");
 		return idToRsc;
 	}
 
@@ -94,6 +96,7 @@ public class ServerConf {
 	}
 
 	public void addResource(ResourceConf entry) {
+		System.out.println(entry.getClazz()+" <_<");
 		if (entry == null)
 			return;
 		else if (routing == null)
