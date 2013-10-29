@@ -44,7 +44,7 @@ public class ResourceUtil {
 		if (paths != null) {
 			// if this server has already seen this message return null
 			for (RoutingPath rp : paths) {
-				System.out.println(rp.getNode());
+				//System.out.println(rp.getNode());
 				if (iam.equalsIgnoreCase(rp.getNode()))
 					return null;
 			}
@@ -57,7 +57,7 @@ public class ResourceUtil {
 		rpb.setTime(System.currentTimeMillis());
 		
 		hbldr.addPath(rpb.build());
-		System.out.println(hbldr.getPathList().toString());
+		//System.out.println(hbldr.getPathList().toString());
 		return bldr.build();
 	}
 

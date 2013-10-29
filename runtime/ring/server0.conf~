@@ -1,12 +1,6 @@
 {
     "nearest": {
         "nearestNodes": {
-            "two": {
-      		"nodeId": "two",
-                "host": "localhost",
-                "port": 5575,
-                "mgmtPort": 5675
-            },
             "one": {
                 "nodeId": "one",
                 "host": "localhost",
@@ -29,7 +23,7 @@
             "name": "finger",
             "id": 2,
             "clazz": "poke.resources.PokeResource",
-            "enabled": false
+            "enabled": true
         },
         {
             "name": "namespace.list",
@@ -47,6 +41,42 @@
             "name": "namespace.remove",
             "id": 13,
             "clazz": "poke.resources.NameSpaceResource",
+            "enabled": false
+        },
+        {
+            "name": "document.add",
+            "id": 20,
+            "clazz": "poke.resources.DocumentResource",
+            "enabled": false
+        },
+        {
+            "name": "document.find",
+            "id": 21,
+            "clazz": "poke.resources.DocumentResource",
+            "enabled": false
+        },
+        {
+            "name": "document.update",
+            "id": 22,
+            "clazz": "poke.resources.DocumentResource",
+            "enabled": false
+        },
+        {
+            "name": "document.remove",
+            "id": 23,
+            "clazz": "poke.resources.DocumentResource",
+            "enabled": false
+        },
+        {
+            "name": "document.addhandshake",
+            "id": 24,
+            "clazz": "poke.resources.DocumentResource",
+            "enabled": false
+        },
+        {
+            "name": "document.query",
+            "id": 25,
+            "clazz": "poke.resources.DocumentResource",
             "enabled": false
         }
     ]

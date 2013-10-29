@@ -6,12 +6,6 @@
                 "host": "localhost",
                 "port": 5570,
                 "mgmtPort": 5670
-            },
-            "two": {
-                "nodeId": "two",
-                "host": "localhost",
-                "port": 6572,
-                "mgmtPort": 6672
             }
         }
     },

@@ -36,7 +36,7 @@ public class Jab {
 			count++;
 			System.out.println("tag ="+tag);
 			System.out.println("count ="+count);
-			cc.docAdd("/home/virajh/hello.txt", "JabClient", "zero");
+			cc.docAdd("/home/virajh/Downloads/dataedge.pdf", "JabClient", "one");
 		//}
 	}
 

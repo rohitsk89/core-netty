@@ -31,6 +31,7 @@ import eye.Comm.PayloadReply;
 import eye.Comm.Request;
 import eye.Comm.Response;
 import eye.Comm.RoutingPath;
+import eye.Comm.Header.ReplyStatus;
 
 /**
  * The forward resource is used by the ResourceFactory to send requests to a
@@ -62,11 +63,25 @@ public class ForwardResource implements Resource {
 
 	@Override
 	public Response process(Request request) {
-		System.out.println("Inside ForwardReso");
+		// virajh
+		//System.out.println("Inside ForwardReso");
 		String nextNode = determineForwardNode(request);
+		//System.out.println(nextNode+"!!!");
+		
 		if (nextNode != null) {
 			Request fwd = ResourceUtil.buildForwardMessage(request, cfg);
-						
+			
+			if (fwd==null)
+			{
+				Response.Builder rb = Response.newBuilder();
+				rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "duplicate message"));
+				PayloadReply.Builder pb = PayloadReply.newBuilder();
+				rb.setBody(pb.build());
+				Response reply = rb.build();
+				return reply;
+			}
+
+			
 			// TODO forward the request
 
 			return null;
@@ -101,13 +116,22 @@ public class ForwardResource implements Resource {
 	 * @return
 	 */
 	private String determineForwardNode(Request request) {
+		//System.out.println("Inside determineForwardNode()");
 		List<RoutingPath> paths = request.getHeader().getPathList();
 		if (paths == null || paths.size() == 0) {
+			
+			if(cfg==null)
+				System.out.println("cfg is null");
+			//System.out.println("Is null ^ ?");
+			
 			// pick first nearest
 			NodeDesc nd = cfg.getNearest().getNearestNodes().values().iterator().next();
-			System.out.println();
+			
+			//System.out.println(nd.getNodeId()+" <_<");
+			//System.out.println("below.");
 			return nd.getNodeId();
 		} else {
+			System.out.println("Inside else");
 			// if this server has already seen this message return null
 			for (RoutingPath rp : paths) {
 				System.out.println(rp.getNode());

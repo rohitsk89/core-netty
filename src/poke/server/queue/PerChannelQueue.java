@@ -67,9 +67,7 @@ public class PerChannelQueue implements ChannelQueue {
 		outbound = new LinkedBlockingDeque<com.google.protobuf.GeneratedMessage>();
 
 		iworker = new InboundWorker(tgroup, 1, this);
-		System.out.println("## Before start");
 		iworker.start();
-		System.out.println("####After start");
 
 		oworker = new OutboundWorker(tgroup, 1, this);
 		oworker.start();

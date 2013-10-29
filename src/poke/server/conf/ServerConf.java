@@ -71,6 +71,8 @@ public class ServerConf {
 	}
 
 	public NearestConf getNearest() {
+		if (nearest==null)
+			System.out.println("nearest is null");
 		return nearest;
 	}
 
@@ -96,7 +98,7 @@ public class ServerConf {
 	}
 
 	public void addResource(ResourceConf entry) {
-		System.out.println(entry.getClazz()+" <_<");
+		//System.out.println(entry.getClazz()+" <_<");
 		if (entry == null)
 			return;
 		else if (routing == null)

@@ -196,6 +196,36 @@ public class ClientConnection {
 			logger.warn("Unable to deliver message, queuing");
 		}
 	}
+
+	public void docQuery(String filename, String originator, String toNode)
+	{	//virajh
+
+		Document.Builder d = eye.Comm.Document.newBuilder();
+		d.setDocName(filename);
+
+		// payload containing data
+		Request.Builder r = Request.newBuilder();
+		eye.Comm.Payload.Builder p = Payload.newBuilder();
+		p.setDoc(d.build());
+		r.setBody(p.build());
+
+		// header with routing info
+		eye.Comm.Header.Builder h = Header.newBuilder();
+		h.setOriginator(originator);
+		h.setTime(System.currentTimeMillis());
+		h.setRoutingId(eye.Comm.Header.Routing.DOCQUERY);
+		h.setToNode(toNode);
+		r.setHeader(h.build());
+
+		eye.Comm.Request req = r.build();
+
+		try {
+			// enqueue message
+			outbound.put(req);
+		} catch (InterruptedException e) {
+			logger.warn("Unable to deliver message, queuing");
+		}
+	}
 	
 	public void poke(String toNode,String tag, int num) {
 		// data to send

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import poke.server.conf.ServerConf;
 import poke.server.conf.ServerConf.ResourceConf;
+import poke.server.routing.ForwardResource;
 import eye.Comm.Header;
 
 /**
@@ -82,18 +83,30 @@ public class ResourceFactory {
 	 */
 	public Resource resourceInstance(Header header) {
 		// is the message for this server?
-		System.out.println("####Resource Factory#####");
 		
 		if (header.hasToNode()) 
 		{		
 			String iam = cfg.getServer().getProperty("node.id");
 			if (iam.equalsIgnoreCase(header.getToNode()))
 			{
-				System.out.println("Request for self.");; // fall through and process normally
+				System.out.println("request for self");
+				; // fall through and process normally
 			}
 			else {
 				// forward request
 				//create ForwardResource and return
+				// virajh
+				System.out.println("request not for self");
+				try {
+					ForwardResource rsc = (ForwardResource) Beans.instantiate(this.getClass().getClassLoader(), cfg.getServer().getProperty("forward"));
+					rsc.setCfg(cfg);
+					return rsc;
+				}
+				catch (Exception e) {
+					//logger.error(e.getMessage());
+					logger.error("unable to forward request");
+					return null;
+				}
 			}
 		}
 

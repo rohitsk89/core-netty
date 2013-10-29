@@ -1,8 +1,8 @@
 {
     "nearest": {
         "nearestNodes": {
-            "three": {
-                "nodeId": "Zero",
+            "zero": {
+                "nodeId": "zero",
                 "host": "localhost",
                 "port": 5570,
                 "mgmtPort": 5670
