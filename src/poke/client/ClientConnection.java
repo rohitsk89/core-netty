@@ -91,8 +91,10 @@ public class ClientConnection {
 		}
 	}
 	
-	public void docAdd(String filepath, String originator)
+	
+	public void docAdd(String filepath, String originator, String toNode)
 	{
+		//By virajh
 		Document.Builder d = eye.Comm.Document.newBuilder();
 		try {
 			Path path = Paths.get(filepath);
@@ -121,26 +123,60 @@ public class ClientConnection {
 
 		h.setTime(System.currentTimeMillis());
 		h.setRoutingId(eye.Comm.Header.Routing.DOCADD);
-		h.setToNode("zero");
+		h.setToNode(toNode);
 		r.setHeader(h.build());
 
 		eye.Comm.Request req = r.build();
 		
 		try {
 			// enqueue message
-			System.out.println("Req -> " + req);
+			//System.out.println("Req -> " + req);
 			outbound.put(req);
 		} catch (InterruptedException e) {
 			logger.warn("Unable to deliver message, queuing");
 		}
 	}
 
-	public void poke(String tag, int num) {
+	public void docRemove(String filename, String originator, String toNode)
+	{	//virajh
+		
+		Document.Builder d = eye.Comm.Document.newBuilder();
+		d.setDocName(filename);
+
+		// payload containing data
+		Request.Builder r = Request.newBuilder();
+		eye.Comm.Payload.Builder p = Payload.newBuilder();
+		p.setDoc(d.build());
+		r.setBody(p.build());
+
+		// header with routing info
+		eye.Comm.Header.Builder h = Header.newBuilder();
+		h.setOriginator(originator);
+		h.setTime(System.currentTimeMillis());
+		h.setRoutingId(eye.Comm.Header.Routing.DOCREMOVE);
+		h.setToNode(toNode);
+		r.setHeader(h.build());
+
+		eye.Comm.Request req = r.build();
+		
+		try {
+			// enqueue message
+			outbound.put(req);
+		} catch (InterruptedException e) {
+			logger.warn("Unable to deliver message, queuing");
+		}
+	}
+
+	public void docFind(String filename, String originator)
+	{
+		
+	}
+	
+	public void poke(String toNode,String tag, int num) {
 		// data to send
 		Finger.Builder f = eye.Comm.Finger.newBuilder();
 		f.setTag(tag);
 		f.setNumber(num);
-		//System.out.println("inside poke");
 		
 		// payload containing data
 		Request.Builder r = Request.newBuilder();
@@ -154,7 +190,7 @@ public class ClientConnection {
 		h.setTag("test finger");
 		h.setTime(System.currentTimeMillis());
 		h.setRoutingId(eye.Comm.Header.Routing.FINGER);
-		h.setToNode("zero");
+		h.setToNode(toNode);
 		r.setHeader(h.build());
 
 		eye.Comm.Request req = r.build();

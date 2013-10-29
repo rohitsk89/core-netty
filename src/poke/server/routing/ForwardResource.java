@@ -62,7 +62,7 @@ public class ForwardResource implements Resource {
 
 	@Override
 	public Response process(Request request) {
-		
+		System.out.println("Inside ForwardReso");
 		String nextNode = determineForwardNode(request);
 		if (nextNode != null) {
 			Request fwd = ResourceUtil.buildForwardMessage(request, cfg);
@@ -105,10 +105,12 @@ public class ForwardResource implements Resource {
 		if (paths == null || paths.size() == 0) {
 			// pick first nearest
 			NodeDesc nd = cfg.getNearest().getNearestNodes().values().iterator().next();
+			System.out.println();
 			return nd.getNodeId();
 		} else {
 			// if this server has already seen this message return null
 			for (RoutingPath rp : paths) {
+				System.out.println(rp.getNode());
 				for (NodeDesc nd : cfg.getNearest().getNearestNodes().values()) {
 					if (!nd.getNodeId().equalsIgnoreCase(rp.getNode()))
 						return nd.getNodeId();

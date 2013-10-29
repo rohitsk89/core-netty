@@ -53,13 +53,13 @@ public class ServerConf {
 					if (routing != null) {
 						for (ResourceConf entry : routing) {
 							idToRsc.put(entry.id, entry);
-							System.out.println(entry.id+" => "+entry.getName()+" "+entry.getClazz());
+							//System.out.println(entry.id+" => "+entry.getName()+" "+entry.getClazz());
 						}
 					}
 				}
 			}
 		}
-		System.out.println(">_<");
+		//System.out.println(">_<");
 		return idToRsc;
 	}
 

@@ -35,7 +35,7 @@ public class DocumentResource implements Resource {
 	
 	@Override
 	public Response process(Request request) {
-		
+		//virajh
 		int action = request.getHeader().getRoutingId().getNumber();
 		Response res = null;
 		
@@ -53,6 +53,7 @@ public class DocumentResource implements Resource {
 			break;
 		case 23:
 			System.out.println("DOCUMENT REMOVE");
+			res = docRemove(request);
 			break;
 		case 24:
 			System.out.println("DOCUMENT HANDSHAKE");
@@ -78,7 +79,7 @@ public class DocumentResource implements Resource {
 	}
 	
 	private Response docAdd(Request request)
-	{
+	{ //virajh
 		Document doc = request.getBody().getDoc();
 		File file = new File(savePath, doc.getDocName());
 		//long totalChunks = doc.getTotalChunk();
@@ -89,8 +90,8 @@ public class DocumentResource implements Resource {
 		FileWriter fw;
 		try {
 			fw = new FileWriter(file);
-			fw.write("File recieved from "+request.getHeader().getOriginator()+" on "+new Date());
-			fw.write("\n");
+			//fw.write("File recieved from "+request.getHeader().getOriginator()+" on "+new Date());
+			//fw.write("\n");
 			fw.write(chunk);
 			fw.flush();
 			fw.close();
@@ -120,4 +121,19 @@ public class DocumentResource implements Resource {
 		}
 	}
 
+	private Response docRemove(Request request)
+	{
+		System.out.println(request.getBody().getDoc().getDocName()+" deleted.");
+		
+		Response.Builder rb = Response.newBuilder();
+
+		rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "File deleted succesfully."));
+		
+		// payload --> empty
+		PayloadReply.Builder pb = PayloadReply.newBuilder();
+		rb.setBody(pb.build());
+		
+		Response reply = rb.build();
+		return reply;
+	}
 }
