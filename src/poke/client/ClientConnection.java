@@ -170,6 +170,7 @@ public class ClientConnection {
 	public void docFind(String filename, String originator, String toNode)
 	{	//virajh
 
+
 		Document.Builder d = eye.Comm.Document.newBuilder();
 		d.setDocName(filename);
 
@@ -184,12 +185,15 @@ public class ClientConnection {
 		h.setOriginator(originator);
 		h.setTime(System.currentTimeMillis());
 		h.setRoutingId(eye.Comm.Header.Routing.DOCFIND);
-		h.setToNode(toNode);
+
 		r.setHeader(h.build());
 
 		eye.Comm.Request req = r.build();
 
-		try {
+		h.setToNode(toNode);
+		r.setHeader(h.build());
+
+	    try {
 			// enqueue message
 			outbound.put(req);
 		} catch (InterruptedException e) {
@@ -213,11 +217,12 @@ public class ClientConnection {
 		eye.Comm.Header.Builder h = Header.newBuilder();
 		h.setOriginator(originator);
 		h.setTime(System.currentTimeMillis());
-		h.setRoutingId(eye.Comm.Header.Routing.DOCQUERY);
+		//h.setRoutingId(eye.Comm.Header.Routing.DOCQUERY);
 		h.setToNode(toNode);
 		r.setHeader(h.build());
 
 		eye.Comm.Request req = r.build();
+
 
 		try {
 			// enqueue message
