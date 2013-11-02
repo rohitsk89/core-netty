@@ -67,6 +67,9 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
 		//if(msg.getHeader().)
 			// TODO this may need to be delegated to a thread pool to allow
 			// async processing of replies
+			if(msg.getHeader().getRoutingId().getNumber() == 23){
+				System.out.println("message - " + msg.getHeader().getReplyMsg());
+			}
 			if(msg.getHeader().getRoutingId().getNumber() == 21){
 				System.out.println("Routing ID is 21");
 				if(msg.getHeader().getReplyCode().getNumber() == 1){

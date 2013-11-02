@@ -17,6 +17,7 @@ package poke.resources;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -97,15 +98,19 @@ public class DocumentResource implements Resource {
 		
 		String chunk = new String(doc.getChunkContent().toByteArray());
 		System.out.println(doc.getDocName()+"\n"+chunk);
-		
-		FileWriter fw;
+		FileOutputStream fos;
+	////	FileWriter fw;
 		try {
-			fw = new FileWriter(file);
+				fos = new FileOutputStream(file, true);
+				fos.write(doc.getChunkContent().toByteArray());
+				fos.flush();
+				fos.close();
+	////		fw = new FileWriter(file);
 			//fw.write("File recieved from "+request.getHeader().getOriginator()+" on "+new Date());
 			//fw.write("\n");
-			fw.write(chunk);
-			fw.flush();
-			fw.close();
+	////		fw.write(chunk);
+	////		fw.flush();
+	////		fw.close();
 
 			Response.Builder rb = Response.newBuilder();
 			

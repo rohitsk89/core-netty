@@ -80,9 +80,10 @@ public class ResourceFactory {
 	public Resource resourceInstance(Header header) {
 		// is the message for this server?
 		
-		if (!header.hasToNode()) 
+		if (header.hasToNode()) 
 		{		
 			String iam = cfg.getServer().getProperty("node.id");
+			System.out.println("i am ->" + iam + " header.getToNode() " + header.getToNode());
 			if (iam.equalsIgnoreCase(header.getToNode()))
 			{
 				System.out.println("request for self");

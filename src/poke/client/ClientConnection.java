@@ -122,7 +122,7 @@ public class ClientConnection {
 		h.setOriginator(originator);
 
 		h.setTime(System.currentTimeMillis());
-		h.setRoutingId(eye.Comm.Header.Routing.DOCADD);
+		h.setRoutingId(eye.Comm.Header.Routing.DOCREMOVE);
 		h.setToNode(toNode);
 		r.setHeader(h.build());
 
@@ -185,11 +185,11 @@ public class ClientConnection {
 		h.setOriginator(originator);
 		h.setTime(System.currentTimeMillis());
 		h.setRoutingId(eye.Comm.Header.Routing.DOCFIND);
-
+		h.setToNode(toNode);
 		r.setHeader(h.build());
 
 		eye.Comm.Request req = r.build();
-		h.setToNode(toNode);
+		
 		System.out.println("to node --> " + h.getToNode() + "  " + h.hasToNode());
 		r.setHeader(h.build());
 
@@ -266,7 +266,7 @@ public class ClientConnection {
 
 		try {
 			// enqueue message
-			System.out.println("Req -> " + req);
+			//System.out.println("Req -> " + req);
 			outbound.put(req);
 		} catch (InterruptedException e) {
 			logger.warn("Unable to deliver message, queuing");

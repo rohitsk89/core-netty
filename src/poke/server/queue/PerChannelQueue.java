@@ -257,8 +257,8 @@ public class PerChannelQueue implements ChannelQueue {
 					}
 
 				} catch (InterruptedException ie) {
-					System.out.println("Interrupted Exception on server");
-					ie.printStackTrace(System.out);
+					//System.out.println("Interrupted Exception on server");
+					//ie.printStackTrace(System.out);
 					break;
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
