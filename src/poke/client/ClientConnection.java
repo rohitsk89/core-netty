@@ -189,8 +189,8 @@ public class ClientConnection {
 		r.setHeader(h.build());
 
 		eye.Comm.Request req = r.build();
-
 		h.setToNode(toNode);
+		System.out.println("to node --> " + h.getToNode() + "  " + h.hasToNode());
 		r.setHeader(h.build());
 
 	    try {
@@ -227,6 +227,15 @@ public class ClientConnection {
 		try {
 			// enqueue message
 			outbound.put(req);
+		} catch (InterruptedException e) {
+			logger.warn("Unable to deliver message, queuing");
+		}
+	}
+	
+	public void forwardRequest(Request request){
+		try {
+			// enqueue message
+			outbound.put(request);
 		} catch (InterruptedException e) {
 			logger.warn("Unable to deliver message, queuing");
 		}

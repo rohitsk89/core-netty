@@ -64,7 +64,7 @@ public class ServerHandler extends SimpleChannelUpstreamHandler {
 			logger.error("ERROR: Unexpected content - null");
 			return;
 		}
-
+		System.out.println("Recieved message");
 		// processing is deferred to the worker threads
 		queueInstance(channel).enqueueRequest(req);
 	}

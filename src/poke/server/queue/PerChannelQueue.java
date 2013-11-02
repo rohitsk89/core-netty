@@ -174,7 +174,7 @@ public class PerChannelQueue implements ChannelQueue {
 				try {
 					// block until a message is enqueued
 					GeneratedMessage msg = sq.outbound.take();
-					System.out.println("++ reply msg -> " + msg);
+					//System.out.println("++ reply msg -> " + msg);
 					if (conn.isWritable()) {
 						boolean rtn = false;
 						if (channel != null && channel.isOpen() && channel.isWritable()) {
@@ -231,6 +231,7 @@ public class PerChannelQueue implements ChannelQueue {
 
 				try {
 					// block until a message is enqueued
+				
 					GeneratedMessage msg = sq.inbound.take();
 
 					// process request and enqueue response
@@ -241,6 +242,7 @@ public class PerChannelQueue implements ChannelQueue {
 						// handle it locally
 						
 						Resource rsc = ResourceFactory.getInstance().resourceInstance(req.getHeader());
+						
 						Response reply = null;
 						
 						if (rsc == null) {
@@ -255,6 +257,7 @@ public class PerChannelQueue implements ChannelQueue {
 					}
 
 				} catch (InterruptedException ie) {
+					System.out.println("Interrupted Exception on server");
 					ie.printStackTrace(System.out);
 					break;
 				} catch (Exception e) {

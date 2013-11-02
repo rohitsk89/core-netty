@@ -25,10 +25,12 @@ import java.util.Date;
 import com.google.protobuf.ByteString;
 
 
+import poke.client.ClientConnection;
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
 import eye.Comm.Document;
 import eye.Comm.Finger;
+import eye.Comm.Header;
 import eye.Comm.PayloadReply;
 import eye.Comm.Request;
 import eye.Comm.Response;
@@ -38,7 +40,7 @@ public class DocumentResource implements Resource {
 
 	//fixed place to save files
 	private static final String savePath="/home/rohit/workspace/core-netty/saved";
-	
+
 	@Override
 	public Response process(Request request) {
 		//virajh
@@ -177,6 +179,8 @@ public class DocumentResource implements Resource {
 		}
 		else{
 			System.out.println("NOT FOUND IN FOLDER");
+//			ClientConnection cc = ClientConnection.initConnection("localhost", 5571);
+//			cc.forwardRequest(request);
 		}
 		}
 		catch (IOException e) 
@@ -213,4 +217,6 @@ public class DocumentResource implements Resource {
 		Response reply = rb.build();
 		return reply;
 	}
+	
+	
 }

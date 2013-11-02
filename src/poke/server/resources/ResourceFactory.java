@@ -52,11 +52,7 @@ public class ResourceFactory {
 	public static void initialize(ServerConf cfg) {
 		try {
 			ResourceFactory.cfg = cfg;
-			//cfg.addResource(new ResourceConf(20, "document.add", "poke.resources.DocumentResource"));
-			//cfg.addResource(new ResourceConf(21, "document.find", "poke.resources.DocumentResource"));
-			//cfg.addResource(new ResourceConf(22, "document.update", "poke.resources.DocumentResource"));
-			//cfg.addResource(new ResourceConf(23, "document.remove", "poke.resources.DocumentResource"));
-			//cfg.addResource(new ResourceConf(24, "document.addhandshake", "poke.resources.DocumentResource"));
+			
 
 			factory.compareAndSet(null, new ResourceFactory());
 		} catch (Exception e) {
@@ -84,7 +80,7 @@ public class ResourceFactory {
 	public Resource resourceInstance(Header header) {
 		// is the message for this server?
 		
-		if (header.hasToNode()) 
+		if (!header.hasToNode()) 
 		{		
 			String iam = cfg.getServer().getProperty("node.id");
 			if (iam.equalsIgnoreCase(header.getToNode()))
@@ -95,12 +91,19 @@ public class ResourceFactory {
 			else {
 				// forward request
 				//create ForwardResource and return
-				// virajh
+				
 				System.out.println("request not for self");
 				try {
-					ForwardResource rsc = (ForwardResource) Beans.instantiate(this.getClass().getClassLoader(), cfg.getServer().getProperty("forward"));
-					rsc.setCfg(cfg);
-					return rsc;
+					Resource rsc = (Resource) Beans.instantiate(this.getClass().getClassLoader(), cfg.getServer().getProperty("forward"));
+					if(rsc instanceof ForwardResource){
+						System.out.println("instance of Forward Resource");
+						((ForwardResource) rsc).setCfg(cfg);
+						return rsc;
+					}
+					else{
+						System.out.println("not an instance of Forward resource" );
+					}
+					
 				}
 				catch (Exception e) {
 					//logger.error(e.getMessage());
@@ -109,7 +112,7 @@ public class ResourceFactory {
 				}
 			}
 		}
-
+		System.out.println("Has to node --> " + header.hasToNode());
 		ResourceConf rc = cfg.findById(header.getRoutingId().getNumber());
 		if (rc == null)
 			return null;

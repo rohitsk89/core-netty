@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.CodedOutputStream;
 
+import poke.client.ClientConnection;
 import poke.server.conf.NodeDesc;
 import poke.server.conf.ServerConf;
 import poke.server.resources.Resource;
@@ -64,13 +65,14 @@ public class ForwardResource implements Resource {
 	@Override
 	public Response process(Request request) {
 		// virajh
-		//System.out.println("Inside ForwardReso");
+		System.out.println("Inside ForwardReso");
 		String nextNode = determineForwardNode(request);
 		//System.out.println(nextNode+"!!!");
 		
 		if (nextNode != null) {
 			Request fwd = ResourceUtil.buildForwardMessage(request, cfg);
-			
+			System.out.println("Next node -> " + nextNode);
+			System.out.println("Forward request" + fwd);
 			if (fwd==null)
 			{
 				Response.Builder rb = Response.newBuilder();
@@ -80,7 +82,12 @@ public class ForwardResource implements Resource {
 				Response reply = rb.build();
 				return reply;
 			}
-
+			// enqueue message
+			String hostname = cfg.getNearest().getNode(nextNode).getHost();
+			int port = cfg.getNearest().getNode(nextNode).getPort();
+			
+			ClientConnection cc = ClientConnection.initConnection(hostname, port);
+			cc.forwardRequest(fwd);
 			
 			// TODO forward the request
 
@@ -91,7 +98,7 @@ public class ForwardResource implements Resource {
 			// edges
 
 			// TODO should we just fail silently?
-
+			System.out.println("no next node");
 			Response.Builder rb = Response.newBuilder();
 			PayloadReply.Builder pb = PayloadReply.newBuilder();
 			Finger.Builder fb = Finger.newBuilder();
@@ -127,7 +134,7 @@ public class ForwardResource implements Resource {
 			// pick first nearest
 			NodeDesc nd = cfg.getNearest().getNearestNodes().values().iterator().next();
 			
-			//System.out.println(nd.getNodeId()+" <_<");
+			System.out.println(nd.getNodeId()+" <_<");
 			//System.out.println("below.");
 			return nd.getNodeId();
 		} else {
