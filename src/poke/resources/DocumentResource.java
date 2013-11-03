@@ -196,7 +196,7 @@ public class DocumentResource implements Resource {
 	}
 
 	private Response docRemove(Request request)
-	{
+	{	//virajh
 		System.out.println(request.getBody().getDoc().getDocName()+" deleted.");
 		
 		Response.Builder rb = Response.newBuilder();
