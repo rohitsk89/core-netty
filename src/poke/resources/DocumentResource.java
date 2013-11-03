@@ -18,20 +18,14 @@ package poke.resources;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-
-import java.util.Date;
 
 import com.google.protobuf.ByteString;
 
-
-import poke.client.ClientConnection;
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
 import eye.Comm.Document;
 import eye.Comm.Finger;
-import eye.Comm.Header;
 import eye.Comm.PayloadReply;
 import eye.Comm.Request;
 import eye.Comm.Response;
@@ -40,7 +34,7 @@ import eye.Comm.Header.ReplyStatus;
 public class DocumentResource implements Resource {
 
 	//fixed place to save files
-	private static final String savePath="/home/rohit/workspace/core-netty/saved";
+	private static final String savePath="./saved";
 
 	@Override
 	public Response process(Request request) {
@@ -93,11 +87,12 @@ public class DocumentResource implements Resource {
 	{ //virajh
 		Document doc = request.getBody().getDoc();
 		File file = new File(savePath, doc.getDocName());
+		
 		//long totalChunks = doc.getTotalChunk();
 		System.out.println("----- File ------" + file.getName());
 		
-		String chunk = new String(doc.getChunkContent().toByteArray());
-		System.out.println(doc.getDocName()+"\n"+chunk);
+//		String chunk = new String(doc.getChunkContent().toByteArray());
+//		System.out.println(doc.getDocName()+"\n"+chunk);
 		FileOutputStream fos;
 	////	FileWriter fw;
 		try {
@@ -105,12 +100,6 @@ public class DocumentResource implements Resource {
 				fos.write(doc.getChunkContent().toByteArray());
 				fos.flush();
 				fos.close();
-	////		fw = new FileWriter(file);
-			//fw.write("File recieved from "+request.getHeader().getOriginator()+" on "+new Date());
-			//fw.write("\n");
-	////		fw.write(chunk);
-	////		fw.flush();
-	////		fw.close();
 
 			Response.Builder rb = Response.newBuilder();
 			
@@ -178,7 +167,6 @@ public class DocumentResource implements Resource {
 	        		
 
 	        		response = rb.build();
-	            	
 	            }
 	        }
 		}

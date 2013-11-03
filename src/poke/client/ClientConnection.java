@@ -122,7 +122,7 @@ public class ClientConnection {
 		h.setOriginator(originator);
 
 		h.setTime(System.currentTimeMillis());
-		h.setRoutingId(eye.Comm.Header.Routing.DOCREMOVE);
+		h.setRoutingId(eye.Comm.Header.Routing.DOCADD);
 		h.setToNode(toNode);
 		r.setHeader(h.build());
 
@@ -217,7 +217,7 @@ public class ClientConnection {
 		eye.Comm.Header.Builder h = Header.newBuilder();
 		h.setOriginator(originator);
 		h.setTime(System.currentTimeMillis());
-		//h.setRoutingId(eye.Comm.Header.Routing.DOCQUERY);
+		h.setRoutingId(eye.Comm.Header.Routing.DOCQUERY);
 		h.setToNode(toNode);
 		r.setHeader(h.build());
 

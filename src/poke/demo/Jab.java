@@ -28,7 +28,7 @@ public class Jab {
 	}
 
 	public void run() {
-		ClientConnection cc = ClientConnection.initConnection("192.168.1.6", 5573);
+		ClientConnection cc = ClientConnection.initConnection("localhost", 5570);
 		ClientListener listener = new ClientPrintListener("jab demo");
 		cc.addListener(listener);
 
@@ -39,7 +39,7 @@ public class Jab {
 
 		//cc.docFind("Hello0.txt", "JabClient", "zero");
 
-		cc.docAdd("/media/rohit/Misc/Downloads/heroku-toolbelt.exe", "JabClient", "one");
+		cc.docAdd("/home/virajh/dataedge.pdf", "JabClient", "one");
 
 		//}
 	}
@@ -52,9 +52,8 @@ public class Jab {
 
 			// we are running asynchronously
 			System.out.println("\nExiting in 5 seconds");
-			Thread.sleep(5000);
-			//System.exit(0);
-
+			Thread.sleep(9000);
+			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
