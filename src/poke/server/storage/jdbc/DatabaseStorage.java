@@ -15,7 +15,11 @@
  */
 package poke.server.storage.jdbc;
 
+import java.sql.Array;
+import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
@@ -25,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import poke.server.storage.Storage;
 
+import com.google.protobuf.ByteString;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
 
@@ -46,6 +51,7 @@ public class DatabaseStorage implements Storage {
 	}
 
 	public DatabaseStorage(Properties cfg) {
+		System.out.println("In DatabaseStorage()");
 		init(cfg);
 	}
 
@@ -187,24 +193,169 @@ public class DatabaseStorage implements Storage {
 	@Override
 	public boolean addDocument(String namespace, Document doc) {
 		// TODO Auto-generated method stub
-		return false;
+
+		Connection conn = null;
+		try{
+			conn = cpool.getConnection();
+			if(conn==null)
+				//System.out.println();
+			conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+			PreparedStatement pst = null;
+			//System.out.println("namespace" +namespace);
+		    String stm = "INSERT INTO fileedge(\"filename\", \"namespace\",\"chunkcontent\",\"chunkid\", \"totalchunk\") VALUES ('"+doc.getDocName()+"', '"+namespace+"','"+doc.getChunkContent().toByteArray()+"',"+doc.getChunkId()+", "+doc.getTotalChunk()+");";
+		    
+			pst = conn.prepareStatement(stm);
+			int x = pst.executeUpdate();
+			if(x==1)
+			{
+				return true;
+			}
+			else{
+				return false;
+			}
+		}catch(Exception e){
+			//System.out.println("Exception in PreparedStatement block");
+			e.printStackTrace();
+			try{
+				conn.rollback();
+				return false;
+			}catch(SQLException s){
+				//System.out.println("SQLException thrown !");
+				e.printStackTrace();
+				return false;
+			}	
+		}finally {
+			if(conn!=null){
+				try{
+					conn.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
-	@Override
-	public boolean removeDocument(String namespace, long docId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	
 	@Override
 	public boolean updateDocument(String namespace, Document doc) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Document> findDocuments(String namespace, Document criteria) {
 		// TODO Auto-generated method stub
+		
+		Connection conn = null;
+			
+				
+				try{
+					conn = cpool.getConnection();
+					System.out.println(conn.isClosed());
+					conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+					PreparedStatement pst1 = null;
+					ResultSet rs1 = null;
+		System.out.println("-----------------------find-------------------------------------------");			
+				
+				java.sql.Statement stm1=conn.createStatement();
+					rs1= stm1.executeQuery("SELECT * FROM fileedge WHERE filename = '"+criteria.getDocName()+"';");
+					
+				
+					System.out.println("result----------"+rs1); 
+				if(!rs1.next())
+					{
+					 	System.out.println("no file in database");
+					//if(criteria.getDocName()== rs1.next())
+							
+					}
+				else
+					{
+					String fn= rs1.getString(1);
+					System.out.println("File" + fn+ "is there is database");
+					}
+				}catch(Exception e){
+					System.out.println("Exception in PreparedStatement block");
+					e.printStackTrace();
+					try{
+						conn.rollback();
+					}catch(SQLException s){
+						System.out.println("SQLException thrown !");
+					}	
+				}finally {
+					if(conn!=null){
+						try{
+							conn.close();
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+					}
+				}
+				
+
+
+	
+		
 		return null;
 	}
+
+	@Override
+	public boolean removeDocument(String namespace, Document docId) {
+		// TODO Auto-generated method stub
+			Connection conn = null;
+					
+						
+						try{
+							conn = cpool.getConnection();
+							System.out.println(conn.isClosed());
+							conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+							PreparedStatement pst1 = null;
+							ResultSet rs1 = null;
+				System.out.println("-----------------------remove-------------------------------------------");			
+							System.out.println("name space"+ namespace);
+							System.out.println("chunk content" + docId.getChunkContent().toString());
+							System.out.println("docname" +docId.getDocName());
+							
+
+						
+	
+					
+							
+							String stm1 = "DELETE FROM fileedge WHERE filename = '"+docId.getDocName()+"';";
+							
+	
+							
+							pst1 = conn.prepareStatement(stm1);
+						if(pst1.executeUpdate()!=0){
+							//deleted
+							System.out.println("deleted------!!!!!!!111");
+						}
+						else{
+							//not deleted
+							System.out.println("not removed------!!!!!!!111");
+						}
+					
+						}catch(Exception e){
+							System.out.println("Exception in PreparedStatement block");
+							e.printStackTrace();
+							try{
+								conn.rollback();
+							}catch(SQLException s){
+								System.out.println("SQLException thrown !");
+							}	
+						}finally {
+							if(conn!=null){
+								try{
+									conn.close();
+								}catch(Exception e){
+									e.printStackTrace();
+								}
+							}
+						}
+						
+
+
+		return false;
+	}
+
 }

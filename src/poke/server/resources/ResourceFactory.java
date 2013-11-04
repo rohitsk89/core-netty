@@ -16,6 +16,7 @@
 package poke.server.resources;
 
 import java.beans.Beans;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -127,5 +128,23 @@ public class ResourceFactory {
 			logger.error("unable to create resource " + rc.getClazz());
 			return null;
 		}
+	}
+
+	public ForwardResource getForwardResource() {
+		// virajh
+		// to be used for replication by PerChannelQueue
+		
+		try {
+			Resource rsc = (Resource) Beans.instantiate(this.getClass().getClassLoader(), cfg.getServer().getProperty("forward"));
+			((ForwardResource) rsc).setCfg(cfg);
+			return (ForwardResource) rsc;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 }

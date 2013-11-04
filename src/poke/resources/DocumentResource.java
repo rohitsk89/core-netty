@@ -17,13 +17,22 @@ package poke.resources;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
+import java.sql.SQLException;
+import java.util.*;
+
 import com.google.protobuf.ByteString;
+import com.jolbox.bonecp.BoneCP;
+import com.jolbox.bonecp.BoneCPConfig;
+
+
 
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
+import poke.server.storage.Storage;
+import poke.server.storage.jdbc.DatabaseStorage;
 import eye.Comm.Document;
 import eye.Comm.Finger;
 import eye.Comm.PayloadReply;
@@ -33,9 +42,21 @@ import eye.Comm.Header.ReplyStatus;
 
 public class DocumentResource implements Resource {
 
-	//fixed place to save files
-	private static final String savePath="./saved";
+//"---------------------------------------------------------------------------------------------------"
+public static final String sDriver = "org.postgresql.Driver";
+public static final String sUrl = "jdbc:postgresql://localhost:5432/jerry";
+public static String sUser="jdbc.user";
+public static String sPass="jdbc.password";
+private Storage store;
+protected BoneCP cpool;
+	BoneCPConfig config = new BoneCPConfig();
+	Properties properties = new Properties();
+//"---------------------------------------------------------------------------------------------------"
 
+
+	//fixed place to save files
+	private static final String savePath="/home/virajh/workspace/275/saved";
+	
 	@Override
 	public Response process(Request request) {
 		//virajh
@@ -83,50 +104,66 @@ public class DocumentResource implements Resource {
 //        DOCADDHANDSHAKE = 24;		
 	}
 	
-	private Response docAdd(Request request) 
+	public Response docAdd(Request request) 
 	{ //virajh
 		Document doc = request.getBody().getDoc();
-		File file = new File(savePath, doc.getDocName());
-		
-		//long totalChunks = doc.getTotalChunk();
-		System.out.println("----- File ------" + file.getName());
-		
-//		String chunk = new String(doc.getChunkContent().toByteArray());
-//		System.out.println(doc.getDocName()+"\n"+chunk);
-		FileOutputStream fos;
-	////	FileWriter fw;
+		String namespace = request.getBody().getSpace().getName();
+		DatabaseStorage dbs = null;
 		try {
-				fos = new FileOutputStream(file, true);
-				fos.write(doc.getChunkContent().toByteArray());
-				fos.flush();
-				fos.close();
+				dbs = new DatabaseStorage(setProperties());
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("in doc resource");
+			boolean flag = dbs.addDocument(namespace, doc);
 
-			Response.Builder rb = Response.newBuilder();
-			
-			// metadata
-			rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "File saved succesfully."));
-			
-			// payload --> empty
-			PayloadReply.Builder pb = PayloadReply.newBuilder();
-			rb.setBody(pb.build());
+			if(flag){
+				Response.Builder rb = Response.newBuilder();
 
-			Response reply = rb.build();
-			return reply;
-			
-		}
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-			Response.Builder rb = Response.newBuilder();
-			rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.FAILURE, "Operation failed."));
-			PayloadReply.Builder pb = PayloadReply.newBuilder();
-			rb.setBody(pb.build());
-			Response reply = rb.build();
-			return reply;
-		}
+				// metadata
+				rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "File saved succesfully."));
+
+				// payload --> empty
+				PayloadReply.Builder pb = PayloadReply.newBuilder();
+				rb.setBody(pb.build());
+
+				return rb.build();
+			}
+			else{
+				Response.Builder rb = Response.newBuilder();
+				rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.FAILURE, "Operation failed."));
+				PayloadReply.Builder pb = PayloadReply.newBuilder();
+				rb.setBody(pb.build());
+				return rb.build();
+			}
 	}
 	
-	private Response docFind(Request request){
+
+	public Properties setProperties() throws ClassNotFoundException, SQLException{
+		Class.forName(sDriver);
+		
+		config.setPassword("mogli465");
+		System.out.println("in properties password");		
+		config.setUsername("tom");
+		System.out.println("in properties username");
+		config.setJdbcUrl(sUrl);
+		System.out.println("in properties url");
+		
+		properties.setProperty("jdbc.driver",sDriver);
+		
+		properties.setProperty("jdbc.url",sUrl);
+		properties.setProperty(sUser,"tom");
+		properties.setProperty(sPass,"mogli465");
+		
+//		cpool = new BoneCP(config);
+		System.out.println("Database Properties are set----------------------------------------------------");
+		return properties;
+	}
+	public Response docFind(Request request) {
 		Response response = null;
 				
 		String fileName = request.getBody().getDoc().getDocName();
@@ -139,7 +176,7 @@ public class DocumentResource implements Resource {
 	        {
 	            if (fileName.equals(fil.getName()))
 	            {
-	            	System.out.println("Found the file");
+	            	//System.out.println("Found the file");
 	            	Response.Builder rb = Response.newBuilder();
 	            	byte[] data = new byte[65000];
 	            	FileInputStream fileInputStream = new FileInputStream(fil);
@@ -151,8 +188,9 @@ public class DocumentResource implements Resource {
 	    			d.setChunkId(001);
 	    			//d.setDocName(filepath);
 	    			d.setDocSize(1);
-	    			d.setTotalChunk(1);
+	    			d.setTotalChunk(6);
 	            	d.setDocName(fil.getName());
+	            	d.setId(1);
 	        		// metadata
 	        		rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, null));
 	        		
@@ -167,13 +205,28 @@ public class DocumentResource implements Resource {
 	        		
 
 	        		response = rb.build();
+	        		try{
+	        		//"---------------------------------------------------------------------------------------------------"
+	    			//Properties property=setProperties();
+	    			DatabaseStorage dbs1 = new DatabaseStorage(setProperties());
+	    			System.out.println("in doc find");
+	    		//	DatabaseStorage dbs = new DatabaseStorage(setProperties());
+	    			List<Document> docs = dbs1.findDocuments(savePath, request.getBody().getDoc());
+	    			//return reply;
+	    //"---------------------------------------------------------------------------------------------------"			
+	        		}
+	        		catch(SQLException e)
+	        		{
+	        			System.out.println("error in properties");
+	        		} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 	            }
 	        }
 		}
 		else{
 			System.out.println("NOT FOUND IN FOLDER");
-//			ClientConnection cc = ClientConnection.initConnection("localhost", 5571);
-//			cc.forwardRequest(request);
 		}
 		}
 		catch (IOException e) 
@@ -196,7 +249,7 @@ public class DocumentResource implements Resource {
 	}
 
 	private Response docRemove(Request request)
-	{	//virajh
+	{
 		System.out.println(request.getBody().getDoc().getDocName()+" deleted.");
 		
 		Response.Builder rb = Response.newBuilder();
@@ -208,8 +261,25 @@ public class DocumentResource implements Resource {
 		rb.setBody(pb.build());
 		
 		Response reply = rb.build();
+		
+		try{
+    		//"---------------------------------------------------------------------------------------------------"
+			//Properties property=setProperties();
+			DatabaseStorage dbs1 = new DatabaseStorage(setProperties());
+			System.out.println("in doc remove");
+		//	DatabaseStorage dbs = new DatabaseStorage(setProperties());
+			//dbs1.removeDocument(savePath, request.getBody().getDoc());
+			//return reply;
+//"---------------------------------------------------------------------------------------------------"			
+    		}
+    		catch(SQLException e)
+    		{
+    			System.out.println("error in properties");
+    		} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
 		return reply;
 	}
-	
-	
 }

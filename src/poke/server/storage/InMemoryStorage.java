@@ -68,19 +68,6 @@ public class InMemoryStorage implements Storage {
 	}
 
 	@Override
-	public boolean removeDocument(String namespace, long docId) {
-		if (namespace == null)
-			namespace = sNoName;
-
-		boolean rtn = false;
-		DataNameSpace list = data.get(namespace);
-		if (list != null)
-			rtn = list.remove(docId);
-
-		return rtn;
-	}
-
-	@Override
 	public boolean updateDocument(String namespace, Document doc) {
 		return addDocument(namespace, doc);
 	}
@@ -226,5 +213,11 @@ public class InMemoryStorage implements Storage {
 	public void release() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public boolean removeDocument(String namespace, Document docId) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

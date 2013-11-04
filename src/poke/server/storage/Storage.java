@@ -37,7 +37,7 @@ public interface Storage {
 
 	boolean addDocument(String namespace, Document doc);
 
-	boolean removeDocument(String namespace, long docId);
+	boolean removeDocument(String namespace, Document docId);
 
 	boolean updateDocument(String namespace, Document doc);
 

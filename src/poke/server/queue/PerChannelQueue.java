@@ -24,12 +24,16 @@ import org.jboss.netty.channel.ChannelFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import poke.resources.DocumentResource;
+import poke.server.conf.ServerConf;
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceFactory;
 import poke.server.resources.ResourceUtil;
+import poke.server.routing.ForwardResource;
 
 import com.google.protobuf.GeneratedMessage;
 
+import eye.Comm.Header;
 import eye.Comm.Header.ReplyStatus;
 import eye.Comm.Request;
 import eye.Comm.Response;
@@ -228,7 +232,10 @@ public class PerChannelQueue implements ChannelQueue {
 			while (true) {
 				if (!forever && sq.inbound.size() == 0)
 					break;
-
+				
+				Resource rsc = null;
+				Response reply = null;
+				Request req = null;
 				try {
 					// block until a message is enqueued
 				
@@ -236,14 +243,12 @@ public class PerChannelQueue implements ChannelQueue {
 
 					// process request and enqueue response
 					if (msg instanceof Request) {
-						Request req = ((Request) msg);
+						req = ((Request) msg);
 
 						// do we need to route the request?
 						// handle it locally
 						
-						Resource rsc = ResourceFactory.getInstance().resourceInstance(req.getHeader());
-						
-						Response reply = null;
+						rsc = ResourceFactory.getInstance().resourceInstance(req.getHeader());
 						
 						if (rsc == null) {
 							logger.error("failed to obtain resource for " + req);
@@ -264,6 +269,17 @@ public class PerChannelQueue implements ChannelQueue {
 					System.out.println(e.getMessage());
 					PerChannelQueue.logger.error("Unexpected processing failure", e);
 					break;
+				}
+				if(rsc instanceof DocumentResource)
+				{ // virajh
+					// replicate to other node
+					if(reply.getHeader().getReplyCode() == ReplyStatus.SUCCESS)
+					{
+						System.out.println("Replicate.");
+						ForwardResource newResc = ResourceFactory.getInstance().getForwardResource();
+						newResc.process(req);
+					}
+
 				}
 			}
 
