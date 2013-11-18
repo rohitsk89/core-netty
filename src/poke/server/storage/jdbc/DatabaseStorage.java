@@ -203,6 +203,8 @@ public class DatabaseStorage implements Storage {
 			PreparedStatement pst = null;
 			//System.out.println("namespace" +namespace);
 		    String stm = "INSERT INTO fileedge(\"filename\", \"namespace\",\"chunkcontent\",\"chunkid\", \"totalchunk\") VALUES ('"+doc.getDocName()+"', '"+namespace+"','"+doc.getChunkContent().toByteArray()+"',"+doc.getChunkId()+", "+doc.getTotalChunk()+");";
+		    System.out.println("File recieved: ");
+		    System.out.println(new String(doc.getChunkContent().toByteArray()));
 		    
 			pst = conn.prepareStatement(stm);
 			int x = pst.executeUpdate();
@@ -256,13 +258,13 @@ public class DatabaseStorage implements Storage {
 					conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 					PreparedStatement pst1 = null;
 					ResultSet rs1 = null;
-		System.out.println("-----------------------find-------------------------------------------");			
+					//System.out.println("-----------------------find-------------------------------------------");			
 				
 				java.sql.Statement stm1=conn.createStatement();
 					rs1= stm1.executeQuery("SELECT * FROM fileedge WHERE filename = '"+criteria.getDocName()+"';");
 					
 				
-					System.out.println("result----------"+rs1); 
+					System.out.println("result "+rs1); 
 				if(!rs1.next())
 					{
 					 	System.out.println("no file in database");
@@ -272,7 +274,7 @@ public class DatabaseStorage implements Storage {
 				else
 					{
 					String fn= rs1.getString(1);
-					System.out.println("File" + fn+ "is there is database");
+					System.out.println("File " + fn+ " is there is database");
 					}
 				}catch(Exception e){
 					System.out.println("Exception in PreparedStatement block");

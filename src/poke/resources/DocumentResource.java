@@ -84,12 +84,15 @@ protected BoneCP cpool;
 		case 24:
 			System.out.println("DOCUMENT HANDSHAKE");
 			break;
+		case 25:
+			System.out.println("DOCUMENT QUERY");
+			break;
 		}
 		
 		if(res==null)
 		{
 			Response.Builder rb = Response.newBuilder();
-			rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.MISSINGARG, "Unknown operation."));
+			rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.FAILURE, "Unsupported operation."));
 			PayloadReply.Builder pb = PayloadReply.newBuilder();
 			rb.setBody(pb.build());
 			Response reply = rb.build();
@@ -160,9 +163,10 @@ protected BoneCP cpool;
 		properties.setProperty(sPass,"mogli465");
 		
 //		cpool = new BoneCP(config);
-		System.out.println("Database Properties are set----------------------------------------------------");
+		System.out.println("Database Properties are set");
 		return properties;
 	}
+
 	public Response docFind(Request request) {
 		Response response = null;
 				

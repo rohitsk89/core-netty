@@ -39,7 +39,7 @@ public class Jab {
 
 		cc.docFind("hello.txt", "JabClient", "zero");
 
-		//cc.docAdd("/home/virajh/hello.txt", "JabClient", "zero");
+		//cc.docAdd("/home/virajh/hello.txt", "virajh", "one");
 
 		//}
 	}
