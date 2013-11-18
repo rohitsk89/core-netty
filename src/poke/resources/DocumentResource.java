@@ -150,11 +150,11 @@ protected BoneCP cpool;
 		Class.forName(sDriver);
 		
 		config.setPassword("mogli465");
-		System.out.println("in properties password");		
+		//System.out.println("in properties password");		
 		config.setUsername("tom");
-		System.out.println("in properties username");
+		//System.out.println("in properties username");
 		config.setJdbcUrl(sUrl);
-		System.out.println("in properties url");
+		//System.out.println("in properties url");
 		
 		properties.setProperty("jdbc.driver",sDriver);
 		
@@ -163,7 +163,7 @@ protected BoneCP cpool;
 		properties.setProperty(sPass,"mogli465");
 		
 //		cpool = new BoneCP(config);
-		System.out.println("Database Properties are set");
+		//System.out.println("Database Properties are set");
 		return properties;
 	}
 

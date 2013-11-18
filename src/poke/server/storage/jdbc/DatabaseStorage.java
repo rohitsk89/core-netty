@@ -204,7 +204,7 @@ public class DatabaseStorage implements Storage {
 			//System.out.println("namespace" +namespace);
 		    String stm = "INSERT INTO fileedge(\"filename\", \"namespace\",\"chunkcontent\",\"chunkid\", \"totalchunk\") VALUES ('"+doc.getDocName()+"', '"+namespace+"','"+doc.getChunkContent().toByteArray()+"',"+doc.getChunkId()+", "+doc.getTotalChunk()+");";
 		    System.out.println("File recieved: "+doc.getDocName());
-		    System.out.println(new String(doc.getChunkContent().toByteArray()));
+		    //System.out.println(new String(doc.getChunkContent().toByteArray()));
 		    
 			pst = conn.prepareStatement(stm);
 			int x = pst.executeUpdate();
@@ -236,7 +236,6 @@ public class DatabaseStorage implements Storage {
 			}
 		}
 	}
-
 	
 	@Override
 	public boolean updateDocument(String namespace, Document doc) {
@@ -250,11 +249,10 @@ public class DatabaseStorage implements Storage {
 		// TODO Auto-generated method stub
 		
 		Connection conn = null;
-			
-				
+
 				try{
 					conn = cpool.getConnection();
-					System.out.println(conn.isClosed());
+					//System.out.println(conn.isClosed());
 					conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 					PreparedStatement pst1 = null;
 					ResultSet rs1 = null;
@@ -263,13 +261,11 @@ public class DatabaseStorage implements Storage {
 				java.sql.Statement stm1=conn.createStatement();
 					rs1= stm1.executeQuery("SELECT * FROM fileedge WHERE filename = '"+criteria.getDocName()+"';");
 					
-				
 					//System.out.println("result "+rs1); 
 				if(!rs1.next())
 					{
 					 	System.out.println("no file in database");
 					//if(criteria.getDocName()== rs1.next())
-							
 					}
 				else
 					{
@@ -293,11 +289,7 @@ public class DatabaseStorage implements Storage {
 						}
 					}
 				}
-				
 
-
-	
-		
 		return null;
 	}
 
@@ -309,7 +301,7 @@ public class DatabaseStorage implements Storage {
 						
 						try{
 							conn = cpool.getConnection();
-							System.out.println(conn.isClosed());
+							//System.out.println(conn.isClosed());
 							conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 							PreparedStatement pst1 = null;
 							ResultSet rs1 = null;
