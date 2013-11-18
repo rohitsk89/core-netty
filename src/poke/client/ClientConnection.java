@@ -91,10 +91,11 @@ public class ClientConnection {
 		}
 	}
 	
+	// Team Insane starts  -- to send DOCADD request to the server
 	
 	public void docAdd(String filepath, String originator, String toNode)
 	{
-		//By virajh
+		
 		Document.Builder d = eye.Comm.Document.newBuilder();
 		try {
 			Path path = Paths.get(filepath);
@@ -137,8 +138,9 @@ public class ClientConnection {
 		}
 	}
 
+	// Team Insane starts -- to send DOCREMOVE request to the server
 	public void docRemove(String filename, String originator, String toNode)
-	{	//virajh
+	{
 		
 		Document.Builder d = eye.Comm.Document.newBuilder();
 		d.setDocName(filename);
@@ -167,6 +169,7 @@ public class ClientConnection {
 		}
 	}
 
+	//Team Insane starts  -- to send DOCFIND request to the server
 	public void docFind(String filename, String originator, String toNode)
 	{	//virajh
 
@@ -201,6 +204,7 @@ public class ClientConnection {
 		}
 	}
 
+	//Team Insane starts -- to send DOCQUERY request to the server
 	public void docQuery(String filename, String originator, String toNode)
 	{	//virajh
 
@@ -232,6 +236,8 @@ public class ClientConnection {
 		}
 	}
 	
+	//Team Insane starts -- to put forward request message to the outbound queue of server
+	// in server to server communication, Server who is forwarding the request will act as client 
 	public void forwardRequest(Request request){
 		try {
 			// enqueue message

@@ -183,7 +183,7 @@ public class Server {
 		// Bind and start to accept incoming connections.
 		Channel ch = bs.bind(new InetSocketAddress(port));
 		allChannels.add(ch);
-
+		
 		logger.info("Starting server, listening on port = " + port);
 	}
 
