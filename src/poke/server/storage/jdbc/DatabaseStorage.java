@@ -203,7 +203,7 @@ public class DatabaseStorage implements Storage {
 			PreparedStatement pst = null;
 			//System.out.println("namespace" +namespace);
 		    String stm = "INSERT INTO fileedge(\"filename\", \"namespace\",\"chunkcontent\",\"chunkid\", \"totalchunk\") VALUES ('"+doc.getDocName()+"', '"+namespace+"','"+doc.getChunkContent().toByteArray()+"',"+doc.getChunkId()+", "+doc.getTotalChunk()+");";
-		    System.out.println("File recieved: ");
+		    System.out.println("File recieved: "+doc.getDocName());
 		    System.out.println(new String(doc.getChunkContent().toByteArray()));
 		    
 			pst = conn.prepareStatement(stm);
@@ -264,7 +264,7 @@ public class DatabaseStorage implements Storage {
 					rs1= stm1.executeQuery("SELECT * FROM fileedge WHERE filename = '"+criteria.getDocName()+"';");
 					
 				
-					System.out.println("result "+rs1); 
+					//System.out.println("result "+rs1); 
 				if(!rs1.next())
 					{
 					 	System.out.println("no file in database");
@@ -313,20 +313,12 @@ public class DatabaseStorage implements Storage {
 							conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 							PreparedStatement pst1 = null;
 							ResultSet rs1 = null;
-				System.out.println("-----------------------remove-------------------------------------------");			
-							System.out.println("name space"+ namespace);
-							System.out.println("chunk content" + docId.getChunkContent().toString());
-							System.out.println("docname" +docId.getDocName());
-							
-
-						
-	
-					
+				//System.out.println("-----------------------remove-------------------------------------------");			
+							System.out.println("name space: "+ namespace);
+							System.out.println("chunk content: " + docId.getChunkContent().toString());
+							System.out.println("docname: " +docId.getDocName());
 							
 							String stm1 = "DELETE FROM fileedge WHERE filename = '"+docId.getDocName()+"';";
-							
-	
-							
 							pst1 = conn.prepareStatement(stm1);
 						if(pst1.executeUpdate()!=0){
 							//deleted
@@ -354,10 +346,7 @@ public class DatabaseStorage implements Storage {
 								}
 							}
 						}
-						
-
-
-		return false;
+	 return false;
 	}
 
 }

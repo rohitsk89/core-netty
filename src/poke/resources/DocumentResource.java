@@ -121,7 +121,7 @@ protected BoneCP cpool;
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("in doc resource");
+			//System.out.println("in doc resource");
 			boolean flag = dbs.addDocument(namespace, doc);
 
 			if(flag){
@@ -213,7 +213,7 @@ protected BoneCP cpool;
 	        		//"---------------------------------------------------------------------------------------------------"
 	    			//Properties property=setProperties();
 	    			DatabaseStorage dbs1 = new DatabaseStorage(setProperties());
-	    			System.out.println("in doc find");
+	    			//System.out.println("in doc find");
 	    		//	DatabaseStorage dbs = new DatabaseStorage(setProperties());
 	    			List<Document> docs = dbs1.findDocuments(savePath, request.getBody().getDoc());
 	    			//return reply;
@@ -270,7 +270,7 @@ protected BoneCP cpool;
     		//"---------------------------------------------------------------------------------------------------"
 			//Properties property=setProperties();
 			DatabaseStorage dbs1 = new DatabaseStorage(setProperties());
-			System.out.println("in doc remove");
+			//System.out.println("in doc remove");
 		//	DatabaseStorage dbs = new DatabaseStorage(setProperties());
 			//dbs1.removeDocument(savePath, request.getBody().getDoc());
 			//return reply;

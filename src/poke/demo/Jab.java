@@ -37,9 +37,9 @@ public class Jab {
 			System.out.println("tag ="+tag);
 			System.out.println("count ="+count);
 
-		cc.docFind("hello.txt", "JabClient", "zero");
+		//cc.docFind("hello.txt", "JabClient", "zero");
 
-		//cc.docAdd("/home/virajh/hello.txt", "virajh", "one");
+		cc.docAdd("/home/virajh/hello.txt", "JabClient", "one");
 
 		//}
 	}
