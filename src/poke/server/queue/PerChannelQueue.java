@@ -245,8 +245,6 @@ public class PerChannelQueue implements ChannelQueue {
 					if (msg instanceof Request) {
 						req = ((Request) msg);
 
-						// do we need to route the request?
-						// handle it locally
 						
 						rsc = ResourceFactory.getInstance().resourceInstance(req.getHeader());
 						
@@ -255,24 +253,23 @@ public class PerChannelQueue implements ChannelQueue {
 							reply = ResourceUtil.buildError(req.getHeader(), ReplyStatus.FAILURE,
 									"Request not processed");
 						} else {
-							//System.out.println(">_>_>_> "+rsc.getClass());
+							
 							reply = rsc.process(req);
 						}
 						sq.enqueueResponse(reply);
 					}
 
 				} catch (InterruptedException ie) {
-					//System.out.println("Interrupted Exception on server");
-					//ie.printStackTrace(System.out);
+					
 					break;
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
 					PerChannelQueue.logger.error("Unexpected processing failure", e);
 					break;
 				}
+				// Team insane start -- route the request to next node for replication 
 				if(rsc instanceof DocumentResource)
-				{ // virajh
-					// replicate to other node
+				{ 
 					if(reply.getHeader().getReplyCode() == ReplyStatus.SUCCESS)
 					{
 						System.out.println("Replicate.");

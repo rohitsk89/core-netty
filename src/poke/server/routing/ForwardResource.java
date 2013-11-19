@@ -61,14 +61,12 @@ public class ForwardResource implements Resource {
 	public void setCfg(ServerConf cfg) {
 		this.cfg = cfg;
 	}
-
+	// Team insane start  -- Forward the resource to next node in configuration file.
 	@Override
 	public Response process(Request request) {
-		// virajh
 		System.out.println("Inside ForwardReso");
 		String nextNode = determineForwardNode(request);
-		//System.out.println(nextNode+"!!!");
-		
+			
 		if (nextNode != null) {
 			Request fwd = ResourceUtil.buildForwardMessage(request, cfg);
 			System.out.println("Next node -> " + nextNode);

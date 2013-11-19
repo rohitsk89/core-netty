@@ -74,6 +74,7 @@ message Header {
     optional string toNode = 8;
     optional int64 remainingHopCount = 9;
     optional bool isExternal = 10 [default = false];
+    optional string correlationId = 11;
 
     enum Routing {
         FINGER = 2;

@@ -6029,6 +6029,21 @@ public final class Comm {
      * <code>optional bool isExternal = 10 [default = false];</code>
      */
     boolean getIsExternal();
+
+    // optional string correlationId = 11;
+    /**
+     * <code>optional string correlationId = 11;</code>
+     */
+    boolean hasCorrelationId();
+    /**
+     * <code>optional string correlationId = 11;</code>
+     */
+    java.lang.String getCorrelationId();
+    /**
+     * <code>optional string correlationId = 11;</code>
+     */
+    com.google.protobuf.ByteString
+        getCorrelationIdBytes();
   }
   /**
    * Protobuf type {@code Header}
@@ -6144,6 +6159,11 @@ public final class Comm {
             case 80: {
               bitField0_ |= 0x00000100;
               isExternal_ = input.readBool();
+              break;
+            }
+            case 90: {
+              bitField0_ |= 0x00000200;
+              correlationId_ = input.readBytes();
               break;
             }
           }
@@ -6804,6 +6824,49 @@ public final class Comm {
       return isExternal_;
     }
 
+    // optional string correlationId = 11;
+    public static final int CORRELATIONID_FIELD_NUMBER = 11;
+    private java.lang.Object correlationId_;
+    /**
+     * <code>optional string correlationId = 11;</code>
+     */
+    public boolean hasCorrelationId() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional string correlationId = 11;</code>
+     */
+    public java.lang.String getCorrelationId() {
+      java.lang.Object ref = correlationId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          correlationId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string correlationId = 11;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCorrelationIdBytes() {
+      java.lang.Object ref = correlationId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        correlationId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       routingId_ = eye.Comm.Header.Routing.FINGER;
       originator_ = "";
@@ -6815,6 +6878,7 @@ public final class Comm {
       toNode_ = "";
       remainingHopCount_ = 0L;
       isExternal_ = false;
+      correlationId_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -6872,6 +6936,9 @@ public final class Comm {
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeBool(10, isExternal_);
       }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeBytes(11, getCorrelationIdBytes());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -6920,6 +6987,10 @@ public final class Comm {
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(10, isExternal_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(11, getCorrelationIdBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -7062,6 +7133,8 @@ public final class Comm {
         bitField0_ = (bitField0_ & ~0x00000100);
         isExternal_ = false;
         bitField0_ = (bitField0_ & ~0x00000200);
+        correlationId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
 
@@ -7135,6 +7208,10 @@ public final class Comm {
           to_bitField0_ |= 0x00000100;
         }
         result.isExternal_ = isExternal_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.correlationId_ = correlationId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -7211,6 +7288,11 @@ public final class Comm {
         }
         if (other.hasIsExternal()) {
           setIsExternal(other.getIsExternal());
+        }
+        if (other.hasCorrelationId()) {
+          bitField0_ |= 0x00000400;
+          correlationId_ = other.correlationId_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -8080,6 +8162,80 @@ public final class Comm {
       public Builder clearIsExternal() {
         bitField0_ = (bitField0_ & ~0x00000200);
         isExternal_ = false;
+        onChanged();
+        return this;
+      }
+
+      // optional string correlationId = 11;
+      private java.lang.Object correlationId_ = "";
+      /**
+       * <code>optional string correlationId = 11;</code>
+       */
+      public boolean hasCorrelationId() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional string correlationId = 11;</code>
+       */
+      public java.lang.String getCorrelationId() {
+        java.lang.Object ref = correlationId_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          correlationId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string correlationId = 11;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCorrelationIdBytes() {
+        java.lang.Object ref = correlationId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          correlationId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string correlationId = 11;</code>
+       */
+      public Builder setCorrelationId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        correlationId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string correlationId = 11;</code>
+       */
+      public Builder clearCorrelationId() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        correlationId_ = getDefaultInstance().getCorrelationId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string correlationId = 11;</code>
+       */
+      public Builder setCorrelationIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        correlationId_ = value;
         onChanged();
         return this;
       }
@@ -14121,36 +14277,37 @@ public final class Comm {
       "entSet\022\034\n\tdocuments\030\001 \003(\0132\t.Document\"*\n\014" +
       "NameSpaceSet\022\032\n\006spaces\030\001 \003(\0132\n.NameSpace" +
       "\")\n\013RoutingPath\022\014\n\004node\030\001 \002(\t\022\014\n\004time\030\002 " +
-      "\002(\003\"\235\004\n\006Header\022#\n\nrouting_id\030\001 \002(\0162\017.Hea" +
+      "\002(\003\"\264\004\n\006Header\022#\n\nrouting_id\030\001 \002(\0162\017.Hea" +
       "der.Routing\022\022\n\noriginator\030\002 \002(\t\022\013\n\003tag\030\003" +
       " \001(\t\022\014\n\004time\030\004 \001(\003\022\'\n\nreply_code\030\005 \001(\0162\023" +
       ".Header.ReplyStatus\022\021\n\treply_msg\030\006 \001(\t\022\032" +
       "\n\004path\030\007 \003(\0132\014.RoutingPath\022\016\n\006toNode\030\010 \001",
       "(\t\022\031\n\021remainingHopCount\030\t \001(\003\022\031\n\nisExter" +
-      "nal\030\n \001(\010:\005false\"\311\001\n\007Routing\022\n\n\006FINGER\020\002" +
-      "\022\t\n\005STATS\020\003\022\020\n\014NAMESPACEADD\020\n\022\021\n\rNAMESPA" +
-      "CELIST\020\013\022\023\n\017NAMESPACEUPDATE\020\014\022\023\n\017NAMESPA" +
-      "CEREMOVE\020\r\022\n\n\006DOCADD\020\024\022\013\n\007DOCFIND\020\025\022\r\n\tD" +
-      "OCUPDATE\020\026\022\r\n\tDOCREMOVE\020\027\022\023\n\017DOCADDHANDS" +
-      "HAKE\020\030\022\014\n\010DOCQUERY\020\031\"U\n\013ReplyStatus\022\013\n\007S" +
-      "UCCESS\020\001\022\013\n\007FAILURE\020\002\022\n\n\006NOAUTH\020\003\022\016\n\nMIS" +
-      "SINGARG\020\004\022\020\n\014NOCONNECTION\020\005\"U\n\007Payload\022\027" +
-      "\n\006finger\030\001 \001(\0132\007.Finger\022\026\n\003doc\030\002 \001(\0132\t.D",
-      "ocument\022\031\n\005space\030\003 \001(\0132\n.NameSpace\"v\n\014Pa" +
-      "yloadReply\022\027\n\006finger\030\001 \001(\0132\007.Finger\022\027\n\004d" +
-      "ocs\030\002 \003(\0132\t.Document\022\032\n\006spaces\030\003 \003(\0132\n.N" +
-      "ameSpace\022\030\n\005stats\030\004 \001(\0132\t.Document\":\n\007Re" +
-      "quest\022\027\n\006header\030\001 \002(\0132\007.Header\022\026\n\004body\030\002" +
-      " \002(\0132\010.Payload\"@\n\010Response\022\027\n\006header\030\001 \002" +
-      "(\0132\007.Header\022\033\n\004body\030\002 \002(\0132\r.PayloadReply" +
-      "\",\n\tHeartbeat\022\016\n\006nodeId\030\001 \002(\t\022\017\n\007timeRef" +
-      "\030\002 \002(\003\"\225\001\n\007Network\022\016\n\006nodeId\030\001 \002(\t\022\037\n\006ac" +
-      "tion\030\002 \002(\0162\017.Network.Action\"Y\n\006Action\022\014\n",
-      "\010NODEJOIN\020\001\022\r\n\tNODELEAVE\020\002\022\014\n\010NODEDEAD\020\003" +
-      "\022\007\n\003MAP\0207\022\014\n\010ANNOUNCE\0208\022\r\n\010SHUTDOWN\020\347\007\"Z" +
-      "\n\nManagement\022\027\n\005graph\030\001 \001(\0132\010.Network\022\030\n" +
-      "\004beat\030\002 \001(\0132\n.Heartbeat\022\031\n\nisExternal\030\003 " +
-      "\001(\010:\005falseB\007\n\003eyeH\001"
+      "nal\030\n \001(\010:\005false\022\025\n\rcorrelationId\030\013 \001(\t\"" +
+      "\311\001\n\007Routing\022\n\n\006FINGER\020\002\022\t\n\005STATS\020\003\022\020\n\014NA" +
+      "MESPACEADD\020\n\022\021\n\rNAMESPACELIST\020\013\022\023\n\017NAMES" +
+      "PACEUPDATE\020\014\022\023\n\017NAMESPACEREMOVE\020\r\022\n\n\006DOC" +
+      "ADD\020\024\022\013\n\007DOCFIND\020\025\022\r\n\tDOCUPDATE\020\026\022\r\n\tDOC" +
+      "REMOVE\020\027\022\023\n\017DOCADDHANDSHAKE\020\030\022\014\n\010DOCQUER" +
+      "Y\020\031\"U\n\013ReplyStatus\022\013\n\007SUCCESS\020\001\022\013\n\007FAILU" +
+      "RE\020\002\022\n\n\006NOAUTH\020\003\022\016\n\nMISSINGARG\020\004\022\020\n\014NOCO" +
+      "NNECTION\020\005\"U\n\007Payload\022\027\n\006finger\030\001 \001(\0132\007.",
+      "Finger\022\026\n\003doc\030\002 \001(\0132\t.Document\022\031\n\005space\030" +
+      "\003 \001(\0132\n.NameSpace\"v\n\014PayloadReply\022\027\n\006fin" +
+      "ger\030\001 \001(\0132\007.Finger\022\027\n\004docs\030\002 \003(\0132\t.Docum" +
+      "ent\022\032\n\006spaces\030\003 \003(\0132\n.NameSpace\022\030\n\005stats" +
+      "\030\004 \001(\0132\t.Document\":\n\007Request\022\027\n\006header\030\001" +
+      " \002(\0132\007.Header\022\026\n\004body\030\002 \002(\0132\010.Payload\"@\n" +
+      "\010Response\022\027\n\006header\030\001 \002(\0132\007.Header\022\033\n\004bo" +
+      "dy\030\002 \002(\0132\r.PayloadReply\",\n\tHeartbeat\022\016\n\006" +
+      "nodeId\030\001 \002(\t\022\017\n\007timeRef\030\002 \002(\003\"\225\001\n\007Networ" +
+      "k\022\016\n\006nodeId\030\001 \002(\t\022\037\n\006action\030\002 \002(\0162\017.Netw",
+      "ork.Action\"Y\n\006Action\022\014\n\010NODEJOIN\020\001\022\r\n\tNO" +
+      "DELEAVE\020\002\022\014\n\010NODEDEAD\020\003\022\007\n\003MAP\0207\022\014\n\010ANNO" +
+      "UNCE\0208\022\r\n\010SHUTDOWN\020\347\007\"Z\n\nManagement\022\027\n\005g" +
+      "raph\030\001 \001(\0132\010.Network\022\030\n\004beat\030\002 \001(\0132\n.Hea" +
+      "rtbeat\022\031\n\nisExternal\030\003 \001(\010:\005falseB\007\n\003eye" +
+      "H\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -14204,7 +14361,7 @@ public final class Comm {
           internal_static_Header_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Header_descriptor,
-              new java.lang.String[] { "RoutingId", "Originator", "Tag", "Time", "ReplyCode", "ReplyMsg", "Path", "ToNode", "RemainingHopCount", "IsExternal", });
+              new java.lang.String[] { "RoutingId", "Originator", "Tag", "Time", "ReplyCode", "ReplyMsg", "Path", "ToNode", "RemainingHopCount", "IsExternal", "CorrelationId", });
           internal_static_Payload_descriptor =
             getDescriptor().getMessageTypes().get(8);
           internal_static_Payload_fieldAccessorTable = new

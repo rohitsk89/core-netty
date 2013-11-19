@@ -78,6 +78,8 @@ public class ResourceFactory {
 	 * @param route
 	 * @return
 	 */
+	
+	// Team insane start  -- to Forward the request. instantiate ForwardResource class.
 	public Resource resourceInstance(Header header) {
 		// is the message for this server?
 		
@@ -96,6 +98,7 @@ public class ResourceFactory {
 				
 				System.out.println("request not for self");
 				try {
+					// Team insane start  --  instantiate forwardResource
 					Resource rsc = (Resource) Beans.instantiate(this.getClass().getClassLoader(), cfg.getServer().getProperty("forward"));
 					if(rsc instanceof ForwardResource){
 						System.out.println("instance of Forward Resource");
@@ -130,8 +133,8 @@ public class ResourceFactory {
 		}
 	}
 
+	// Team insane start -- planned to use this function for replication 
 	public ForwardResource getForwardResource() {
-		// virajh
 		// to be used for replication by PerChannelQueue
 		
 		try {

@@ -53,13 +53,14 @@ protected BoneCP cpool;
 	Properties properties = new Properties();
 //"---------------------------------------------------------------------------------------------------"
 
+	// Team insane start
 
 	//fixed place to save files
 	private static final String savePath="/home/virajh/workspace/275/saved";
 	
 	@Override
 	public Response process(Request request) {
-		//virajh
+
 		int action = request.getHeader().getRoutingId().getNumber();
 		System.out.println("ACTION ---> " + action);
 		Response res = null;
@@ -106,9 +107,9 @@ protected BoneCP cpool;
 //        DOCREMOVE = 23;
 //        DOCADDHANDSHAKE = 24;		
 	}
-	
+	// Team insane start - To save document into database.
 	public Response docAdd(Request request) 
-	{ //virajh
+	{
 		Document doc = request.getBody().getDoc();
 		String namespace = request.getBody().getSpace().getName();
 		DatabaseStorage dbs = null;
@@ -145,7 +146,7 @@ protected BoneCP cpool;
 			}
 	}
 	
-
+	// Team insane start -- function to set postgreSQL database properties
 	public Properties setProperties() throws ClassNotFoundException, SQLException{
 		Class.forName(sDriver);
 		
@@ -167,6 +168,7 @@ protected BoneCP cpool;
 		return properties;
 	}
 
+	// Team insane start -- function to find document in file system.
 	public Response docFind(Request request) {
 		Response response = null;
 				
@@ -245,13 +247,11 @@ protected BoneCP cpool;
 		}
 		// code to search file locally
 		
-		
-		// if not forward the request
-		
-		
+			
 		return response;
 	}
 
+	// Team insane start  -- function to remove document.
 	private Response docRemove(Request request)
 	{
 		System.out.println(request.getBody().getDoc().getDocName()+" deleted.");
@@ -267,14 +267,14 @@ protected BoneCP cpool;
 		Response reply = rb.build();
 		
 		try{
-    		//"---------------------------------------------------------------------------------------------------"
+
 			//Properties property=setProperties();
 			DatabaseStorage dbs1 = new DatabaseStorage(setProperties());
 			//System.out.println("in doc remove");
-		//	DatabaseStorage dbs = new DatabaseStorage(setProperties());
-			//dbs1.removeDocument(savePath, request.getBody().getDoc());
+			//	DatabaseStorage dbs = new DatabaseStorage(setProperties());
+			dbs1.removeDocument(savePath, request.getBody().getDoc());
 			//return reply;
-//"---------------------------------------------------------------------------------------------------"			
+			
     		}
     		catch(SQLException e)
     		{

@@ -189,7 +189,8 @@ public class DatabaseStorage implements Storage {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
+	// Team insane start  -- Add document to the postgreSQL database
 	@Override
 	public boolean addDocument(String namespace, Document doc) {
 		// TODO Auto-generated method stub
@@ -243,6 +244,7 @@ public class DatabaseStorage implements Storage {
 		return false;
 	}
 
+	// Team insane start  -- document to find in the postgreSQL database
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Document> findDocuments(String namespace, Document criteria) {
@@ -293,6 +295,7 @@ public class DatabaseStorage implements Storage {
 		return null;
 	}
 
+	// Team insane start  -- remove document to the postgreSQL database
 	@Override
 	public boolean removeDocument(String namespace, Document docId) {
 		// TODO Auto-generated method stub
