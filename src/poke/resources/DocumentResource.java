@@ -17,22 +17,23 @@ package poke.resources;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.xml.stream.events.Namespace;
+
+import org.jboss.netty.channel.Channel;
 import java.sql.SQLException;
 import java.util.*;
-
 import com.google.protobuf.ByteString;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
-
-
-
+import poke.server.client.ForwardRequestManager;
 import poke.server.resources.Resource;
 import poke.server.resources.ResourceUtil;
 import poke.server.storage.Storage;
 import poke.server.storage.jdbc.DatabaseStorage;
+import eye.Comm;
 import eye.Comm.Document;
 import eye.Comm.Finger;
 import eye.Comm.PayloadReply;
@@ -41,78 +42,84 @@ import eye.Comm.Response;
 import eye.Comm.Header.ReplyStatus;
 
 public class DocumentResource implements Resource {
+	//"---------------------------------------------------------------------------------------------------"
+	// Team Insane
+	//File server location to save file
+	private static final String savePath="./saved";
+	private static boolean bReplicate=true; // set to true to replicate by default
 
-//"---------------------------------------------------------------------------------------------------"
-public static final String sDriver = "org.postgresql.Driver";
-public static final String sUrl = "jdbc:postgresql://localhost:5432/jerry";
-public static String sUser="jdbc.user";
-public static String sPass="jdbc.password";
-private Storage store;
-protected BoneCP cpool;
+	/*Enable for Database access
+	 * public static final String sDriver = "org.postgresql.Driver";
+	public static final String sUrl = "jdbc:postgresql://localhost:5432/jerry";
+	public static String sUser="jdbc.user";
+	public static String sPass="jdbc.password";
+	private Storage store;
+	protected BoneCP cpool;
 	BoneCPConfig config = new BoneCPConfig();
-	Properties properties = new Properties();
-//"---------------------------------------------------------------------------------------------------"
+	Properties properties = new Properties();*/
+	//"---------------------------------------------------------------------------------------------------"
 
-	// Team insane start
 
-	//fixed place to save files
-	private static final String savePath="/home/virajh/workspace/275/saved";
+	public void turnReplicationOn()
+	{bReplicate=true;}
+	
+	public void turnReplicationOff()
+	{bReplicate=false;}
 	
 	@Override
-	public Response process(Request request) {
-
+	public Response process(Request request, Channel channel) {
+		//Team Insane
 		int action = request.getHeader().getRoutingId().getNumber();
 		System.out.println("ACTION ---> " + action);
-		Response res = null;
+		Response reply = null;
 		
 		switch(action) {
 		
 		case 20:
 			System.out.println("DOCUMENT UPLOAD");
-			res = docAdd(request);
+			reply = docAdd(request);
 			break;
 		case 21:
 			System.out.println("DOCUMENT FIND");
-			res = docFind(request);
+			reply = docFind(request);
 			break;
 		case 22:
 			System.out.println("DOCUMENT UPDATE");
 			break;
 		case 23:
 			System.out.println("DOCUMENT REMOVE");
-			res = docRemove(request);
+			reply = docRemove(request);
 			break;
 		case 24:
 			System.out.println("DOCUMENT HANDSHAKE");
 			break;
-		case 25:
-			System.out.println("DOCUMENT QUERY");
-			break;
 		}
 		
-		if(res==null)
+		if(reply==null)
 		{
 			Response.Builder rb = Response.newBuilder();
-			rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.FAILURE, "Unsupported operation."));
+			rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.MISSINGARG, "Unknown operation."));
 			PayloadReply.Builder pb = PayloadReply.newBuilder();
 			rb.setBody(pb.build());
-			Response reply = rb.build();
-			return reply;
+			reply = rb.build();
+			
 		}
 		
-		return res;
+		return reply;
 //        DOCADD = 20;
 //        DOCFIND = 21;
 //        DOCUPDATE = 22;
 //        DOCREMOVE = 23;
 //        DOCADDHANDSHAKE = 24;		
 	}
-	// Team insane start - To save document into database.
-	public Response docAdd(Request request) 
-	{
+	
+	private Response docAdd(Request request) 
+	{ 
 		Document doc = request.getBody().getDoc();
 		String namespace = request.getBody().getSpace().getName();
-		DatabaseStorage dbs = null;
+		
+		/* Switch this on to use Database
+		 * DatabaseStorage dbs = null;
 		try {
 				dbs = new DatabaseStorage(setProperties());
 			} catch (ClassNotFoundException e) {
@@ -124,57 +131,76 @@ protected BoneCP cpool;
 			}
 			//System.out.println("in doc resource");
 			boolean flag = dbs.addDocument(namespace, doc);
-
-			if(flag){
-				Response.Builder rb = Response.newBuilder();
-
-				// metadata
-				rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "File saved succesfully."));
-
-				// payload --> empty
-				PayloadReply.Builder pb = PayloadReply.newBuilder();
-				rb.setBody(pb.build());
-
-				return rb.build();
+		*/
+		String path=savePath + File.separator; 
+		if(namespace.length() > 0)
+			path =  path + namespace + File.separator + doc.getDocName();
+		else
+			path = path + doc.getDocName();
+		
+		FileOutputStream fos;
+		File file = new File(path);
+		// ensure that we have the folders created
+		file.getParentFile().mkdirs();
+		
+		
+		try {
+			Response.Builder rb = Response.newBuilder();
+			PayloadReply.Builder pb = PayloadReply.newBuilder();
+			Response reply =null;
+			long totalChunks = doc.getTotalChunk();
+			long fileSize = doc.getDocSize();
+			// add safety check to ensure that this file can be locally stored.
+			long size = new File("/").getFreeSpace();
+			if(fileSize >=  size) {
+				System.out.println("File size is: " + fileSize + " Disk size is: " + size);
+				rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.FAILURE, "File size too large."));
 			}
 			else{
-				Response.Builder rb = Response.newBuilder();
-				rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.FAILURE, "Operation failed."));
-				PayloadReply.Builder pb = PayloadReply.newBuilder();
-				rb.setBody(pb.build());
-				return rb.build();
+				fos = new FileOutputStream(file, true);
+				fos.write(doc.getChunkContent().toByteArray());
+				fos.flush();
+				fos.close();
+				
+				// metadata
+				rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "File saved succesfully."));
 			}
+			
+			if(bReplicate == true)
+			{
+				ForwardRequestManager.init().broadcastRequest(request);
+			}
+			// payload --> empty
+			rb.setBody(pb.build());
+			reply = rb.build();
+			System.out.println("Reply returned from server.");
+			return reply;
+			
+		}
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			Response.Builder rb = Response.newBuilder();
+			rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.FAILURE, "Operation failed."));
+			PayloadReply.Builder pb = PayloadReply.newBuilder();
+			rb.setBody(pb.build());
+			Response reply = rb.build();
+			return reply;
+		}
 	}
 	
-	// Team insane start -- function to set postgreSQL database properties
-	public Properties setProperties() throws ClassNotFoundException, SQLException{
-		Class.forName(sDriver);
-		
-		config.setPassword("mogli465");
-		//System.out.println("in properties password");		
-		config.setUsername("tom");
-		//System.out.println("in properties username");
-		config.setJdbcUrl(sUrl);
-		//System.out.println("in properties url");
-		
-		properties.setProperty("jdbc.driver",sDriver);
-		
-		properties.setProperty("jdbc.url",sUrl);
-		properties.setProperty(sUser,"tom");
-		properties.setProperty(sPass,"mogli465");
-		
-//		cpool = new BoneCP(config);
-		//System.out.println("Database Properties are set");
-		return properties;
-	}
-
-	// Team insane start -- function to find document in file system.
-	public Response docFind(Request request) {
+	private Response docFind(Request request){
 		Response response = null;
 				
 		String fileName = request.getBody().getDoc().getDocName();
+		String namespace = request.getBody().getSpace().getName();
+		System.out.println("----- Namespace ------" + namespace);
 		
-		File file = new File(savePath);
+		String path=savePath ; 
+		if(namespace.length() > 0)
+			path =  path + File.separator + namespace;
+		
+		File file = new File(path);
 		File[] allFiles = file.listFiles();
 		try{
 		if(allFiles!=null){
@@ -182,7 +208,7 @@ protected BoneCP cpool;
 	        {
 	            if (fileName.equals(fil.getName()))
 	            {
-	            	//System.out.println("Found the file");
+	            	System.out.println("Found the file");
 	            	Response.Builder rb = Response.newBuilder();
 	            	byte[] data = new byte[65000];
 	            	FileInputStream fileInputStream = new FileInputStream(fil);
@@ -194,11 +220,10 @@ protected BoneCP cpool;
 	    			d.setChunkId(001);
 	    			//d.setDocName(filepath);
 	    			d.setDocSize(1);
-	    			d.setTotalChunk(6);
+	    			d.setTotalChunk(1);
 	            	d.setDocName(fil.getName());
-	            	d.setId(1);
 	        		// metadata
-	        		rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, null));
+	        		rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "Found the file"));
 	        		
 	        		// payload
 	        		PayloadReply.Builder pb = PayloadReply.newBuilder();
@@ -211,28 +236,31 @@ protected BoneCP cpool;
 	        		
 
 	        		response = rb.build();
-	        		try{
-	        		//"---------------------------------------------------------------------------------------------------"
-	    			//Properties property=setProperties();
-	    			DatabaseStorage dbs1 = new DatabaseStorage(setProperties());
-	    			//System.out.println("in doc find");
-	    		//	DatabaseStorage dbs = new DatabaseStorage(setProperties());
-	    			List<Document> docs = dbs1.findDocuments(savePath, request.getBody().getDoc());
-	    			//return reply;
-	    //"---------------------------------------------------------------------------------------------------"			
-	        		}
-	        		catch(SQLException e)
-	        		{
-	        			System.out.println("error in properties");
-	        		} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+	        		/*Team Insane: Turn on to use Database.
+	        		 * try{
+		        		//"---------------------------------------------------------------------------------------------------"
+		    			//Properties property=setProperties();
+		    			DatabaseStorage dbs1 = new DatabaseStorage(setProperties());
+		    			//System.out.println("in doc find");
+		    		//	DatabaseStorage dbs = new DatabaseStorage(setProperties());
+		    			List<Document> docs = dbs1.findDocuments(savePath, request.getBody().getDoc());
+		    			//return reply;
+		    //"---------------------------------------------------------------------------------------------------"			
+		        		}
+		        		catch(SQLException e)
+		        		{
+		        			System.out.println("error in properties");
+		        		} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}*/
 	            }
 	        }
 		}
 		else{
 			System.out.println("NOT FOUND IN FOLDER");
+//			ClientConnection cc = ClientConnection.initConnection("localhost", 5571);
+//			cc.forwardRequest(request);
 		}
 		}
 		catch (IOException e) 
@@ -245,28 +273,66 @@ protected BoneCP cpool;
 			Response reply = rb.build();
 			return reply;
 		}
-		// code to search file locally
 		
-			
+		
 		return response;
 	}
 
-	// Team insane start  -- function to remove document.
+	// Team insane start -- function to set postgreSQL database properties
+		/*Uncomment for DB access
+		 * public Properties setProperties() throws ClassNotFoundException, SQLException{
+			Class.forName(sDriver);
+			
+			config.setPassword("mogli465");
+			System.out.println("in properties password");		
+			config.setUsername("tom");
+			System.out.println("in properties username");
+			config.setJdbcUrl(sUrl);
+			System.out.println("in properties url");
+			
+			properties.setProperty("jdbc.driver",sDriver);
+			
+			properties.setProperty("jdbc.url",sUrl);
+			properties.setProperty(sUser,"tom");
+			properties.setProperty(sPass,"mogli465");
+			
+//			cpool = new BoneCP(config);
+			System.out.println("Database Properties are set");
+			return properties;
+		}*/
+		
 	private Response docRemove(Request request)
-	{
+	{	
 		System.out.println(request.getBody().getDoc().getDocName()+" deleted.");
 		
-		Response.Builder rb = Response.newBuilder();
-
-		rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "File deleted succesfully."));
+		Document doc = request.getBody().getDoc();
+		String namespace = request.getBody().getSpace().getName();
+		System.out.println("----- Namespace ------" + namespace);
 		
+		String path=savePath + File.separator; 
+		if(namespace.length() > 0)
+			path =  path + namespace + File.separator + doc.getDocName();
+		else
+			path = path + doc.getDocName();
+		
+		File file = new File(path);
+		boolean res = file.delete();
+		
+		// ToDo: Should we remove the directory too?
+		// if empty - dlete
+		
+		Response.Builder rb = Response.newBuilder();
+		if(true == res)
+			rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "File deleted succesfully."));
+		else
+			rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "File does not exist."));
 		// payload --> empty
 		PayloadReply.Builder pb = PayloadReply.newBuilder();
 		rb.setBody(pb.build());
 		
 		Response reply = rb.build();
-		
-		try{
+		/* Team Insane: Use this for database
+		 * try{
 
 			//Properties property=setProperties();
 			DatabaseStorage dbs1 = new DatabaseStorage(setProperties());
@@ -283,7 +349,14 @@ protected BoneCP cpool;
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		
+		 */
+		if(bReplicate == true)
+		{
+			ForwardRequestManager.init().broadcastRequest(request);
+		}
+		// ToDo:initiate deletion of replicated files 
 		return reply;
 	}
+	
+	
 }

@@ -15,6 +15,8 @@
  */
 package poke.server.resources;
 
+import org.jboss.netty.channel.Channel;
+
 import eye.Comm.Request;
 import eye.Comm.Response;
 
@@ -34,6 +36,6 @@ public interface Resource {
 	 * @param request
 	 * @return
 	 */
-	Response process(Request request);
+	Response process(Request request, Channel channel);
 
 }

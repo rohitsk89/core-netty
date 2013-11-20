@@ -16,7 +16,6 @@
 package poke.server.resources;
 
 import java.beans.Beans;
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
@@ -78,13 +77,12 @@ public class ResourceFactory {
 	 * @param route
 	 * @return
 	 */
-	
-	// Team insane start  -- to Forward the request. instantiate ForwardResource class.
 	public Resource resourceInstance(Header header) {
 		// is the message for this server?
 		
 		if (header.hasToNode()) 
 		{		
+			System.out.println("Has to node --> " + header.hasToNode());
 			String iam = cfg.getServer().getProperty("node.id");
 			System.out.println("i am ->" + iam + " header.getToNode() " + header.getToNode());
 			if (iam.equalsIgnoreCase(header.getToNode()))
@@ -93,12 +91,12 @@ public class ResourceFactory {
 				; // fall through and process normally
 			}
 			else {
+				//team Insane code block to forward requests
 				// forward request
 				//create ForwardResource and return
 				
 				System.out.println("request not for self");
 				try {
-					// Team insane start  --  instantiate forwardResource
 					Resource rsc = (Resource) Beans.instantiate(this.getClass().getClassLoader(), cfg.getServer().getProperty("forward"));
 					if(rsc instanceof ForwardResource){
 						System.out.println("instance of Forward Resource");
@@ -117,7 +115,7 @@ public class ResourceFactory {
 				}
 			}
 		}
-		System.out.println("Has to node --> " + header.hasToNode());
+		
 		ResourceConf rc = cfg.findById(header.getRoutingId().getNumber());
 		if (rc == null)
 			return null;
@@ -131,23 +129,5 @@ public class ResourceFactory {
 			logger.error("unable to create resource " + rc.getClazz());
 			return null;
 		}
-	}
-
-	// Team insane start -- planned to use this function for replication 
-	public ForwardResource getForwardResource() {
-		// to be used for replication by PerChannelQueue
-		
-		try {
-			Resource rsc = (Resource) Beans.instantiate(this.getClass().getClassLoader(), cfg.getServer().getProperty("forward"));
-			((ForwardResource) rsc).setCfg(cfg);
-			return (ForwardResource) rsc;
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-		
 	}
 }

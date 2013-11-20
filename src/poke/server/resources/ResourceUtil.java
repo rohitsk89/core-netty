@@ -55,7 +55,12 @@ public class ResourceUtil {
 		RoutingPath.Builder rpb = RoutingPath.newBuilder();
 		rpb.setNode(iam);
 		rpb.setTime(System.currentTimeMillis());
-		
+
+		// Team Insane: reduce number of hops remaining
+		if(req.getHeader().hasRemainingHopCount())
+			if(req.getHeader().getRemainingHopCount() > 0)
+				hbldr.setRemainingHopCount(req.getHeader().getRemainingHopCount()-1);
+				
 		hbldr.addPath(rpb.build());
 		//System.out.println(hbldr.getPathList().toString());
 		return bldr.build();

@@ -110,6 +110,7 @@ public class HeartbeatManager extends Thread {
 	 */
 	public void addOutgoingChannel(String nodeId, String host, int mgmtport, Channel ch, SocketAddress sa) {
 		if (!outgoingHB.containsKey(ch)) {
+			logger.info(nodeId);
 			HeartbeatData heart = new HeartbeatData(nodeId, host, null, mgmtport);
 			heart.setConnection(ch, sa);
 			outgoingHB.put(ch, heart);

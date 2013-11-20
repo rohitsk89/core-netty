@@ -15,6 +15,8 @@
  */
 package poke.resources;
 
+
+import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +40,11 @@ public class PokeResource implements Resource {
 	 * @see poke.server.resources.Resource#process(eye.Comm.Finger)
 	 */
 	
-	public Response process(Request request) {
+	public Response process(Request request, Channel channel) {
 		// TODO add code to process the message/event received
 		
 		logger.info("poke: " + request.getBody().getFinger().getTag());
-		
+		//System.out.println("#########Inside Forward Request Process function#######");
 		Response.Builder rb = Response.newBuilder();
 
 		// metadata
@@ -57,7 +59,7 @@ public class PokeResource implements Resource {
 		rb.setBody(pb.build());
 
 		Response reply = rb.build();
-		
+		//System.out.println("#########Reply####### --> " + reply);
 		return reply;
 	}
 }

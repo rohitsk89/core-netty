@@ -85,4 +85,10 @@
 		</java>
 	</target>
 
+	<target name="server2" depends="build">
+		<java fork="yes" maxmemory="1024m" classname="poke.server.Server">
+			<arg value="${basedir}/runtime/ring/server2.conf" />
+			<classpath refid="project.classpath" />
+		</java>
+	</target>
 </project>

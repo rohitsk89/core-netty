@@ -15,6 +15,8 @@
  */
 package poke.resources;
 
+
+import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +28,8 @@ public class NameSpaceResource implements Resource {
 	protected static Logger logger = LoggerFactory.getLogger("server");
 
 	@Override
-	public Response process(Request request) {
+	public Response process(Request request, Channel channel) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

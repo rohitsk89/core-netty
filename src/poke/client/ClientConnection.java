@@ -36,6 +36,7 @@ import com.google.protobuf.ByteString;
 import eye.Comm.Document;
 import eye.Comm.Finger;
 import eye.Comm.Header;
+import eye.Comm.NameSpace;
 import eye.Comm.Payload;
 import eye.Comm.Request;
 
@@ -91,30 +92,25 @@ public class ClientConnection {
 		}
 	}
 	
-	// Team Insane starts  -- to send DOCADD request to the server
-	
-	public void docAdd(String filepath, String originator, String toNode)
+	// Team Insane starts -- Request builder
+	private eye.Comm.Request buildRequest(String filepath, String originator, String toNode, eye.Comm.Header.Routing routeid, byte [] data, String np)
 	{
-		
 		Document.Builder d = eye.Comm.Document.newBuilder();
-		try {
-			Path path = Paths.get(filepath);
-			byte[] data = Files.readAllBytes(path);
-			d.setChunkContent(ByteString.copyFrom(data));
-			d.setChunkId(001);
-			d.setDocSize(1);
-			d.setTotalChunk(1);
-			String[] filename = filepath.split("/");
-			d.setDocName(filename[filename.length-1]);
-		}
-		catch (IOException e)
+		if(null != data && data.length > 0)
 		{
-			logger.warn("Unable to read file "+filepath);
+			d.setChunkContent(ByteString.copyFrom(data));
+			d.setDocSize(data.length);
 		}
-
+		d.setChunkId(001);
+		d.setTotalChunk(1);
+		String[] filename = filepath.split("/");
+		d.setDocName(filename[filename.length-1]);
+		
 		// payload containing data
+		String namespace = np;
 		Request.Builder r = Request.newBuilder();
 		eye.Comm.Payload.Builder p = Payload.newBuilder();
+		p.setSpace(NameSpace.newBuilder().setName(namespace));
 		p.setDoc(d.build());
 		r.setBody(p.build());
 
@@ -123,43 +119,35 @@ public class ClientConnection {
 		h.setOriginator(originator);
 
 		h.setTime(System.currentTimeMillis());
-		h.setRoutingId(eye.Comm.Header.Routing.DOCADD);
+		h.setRoutingId(routeid);
 		h.setToNode(toNode);
 		r.setHeader(h.build());
-
-		eye.Comm.Request req = r.build();
+		return r.build();
+	}
+	// Team Insane starts -- to send DOCADD request to the server
+	public void docAdd(String filepath, String originator, String toNode, String namespace)
+	{
+		Path path = Paths.get(filepath);
 		
 		try {
+			byte[] data = Files.readAllBytes(path);
+			System.out.println("client toNode-> " + toNode);
+			eye.Comm.Request req = buildRequest(filepath, originator, toNode, eye.Comm.Header.Routing.DOCADD, data, namespace);
 			// enqueue message
 			//System.out.println("Req -> " + req);
 			outbound.put(req);
 		} catch (InterruptedException e) {
 			logger.warn("Unable to deliver message, queuing");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-
 	// Team Insane starts -- to send DOCREMOVE request to the server
-	public void docRemove(String filename, String originator, String toNode)
-	{
-		
-		Document.Builder d = eye.Comm.Document.newBuilder();
-		d.setDocName(filename);
-
-		// payload containing data
-		Request.Builder r = Request.newBuilder();
-		eye.Comm.Payload.Builder p = Payload.newBuilder();
-		p.setDoc(d.build());
-		r.setBody(p.build());
-
-		// header with routing info
-		eye.Comm.Header.Builder h = Header.newBuilder();
-		h.setOriginator(originator);
-		h.setTime(System.currentTimeMillis());
-		h.setRoutingId(eye.Comm.Header.Routing.DOCREMOVE);
-		h.setToNode(toNode);
-		r.setHeader(h.build());
-
-		eye.Comm.Request req = r.build();
+	public void docRemove(String filename, String originator, String toNode, String namespace)
+	{	
+		eye.Comm.Request req = buildRequest(filename, originator, toNode, eye.Comm.Header.Routing.DOCREMOVE, null, namespace);
+		System.out.println("DocRemove-> " + req.getHeader().toString());
 		
 		try {
 			// enqueue message
@@ -168,34 +156,13 @@ public class ClientConnection {
 			logger.warn("Unable to deliver message, queuing");
 		}
 	}
-
-	//Team Insane starts  -- to send DOCFIND request to the server
-	public void docFind(String filename, String originator, String toNode)
-	{	//virajh
-
-
-		Document.Builder d = eye.Comm.Document.newBuilder();
-		d.setDocName(filename);
-
-		// payload containing data
-		Request.Builder r = Request.newBuilder();
-		eye.Comm.Payload.Builder p = Payload.newBuilder();
-		p.setDoc(d.build());
-		r.setBody(p.build());
-
-		// header with routing info
-		eye.Comm.Header.Builder h = Header.newBuilder();
-		h.setOriginator(originator);
-		h.setTime(System.currentTimeMillis());
-		h.setRoutingId(eye.Comm.Header.Routing.DOCFIND);
-		h.setToNode(toNode);
-		r.setHeader(h.build());
-
-		eye.Comm.Request req = r.build();
+	// Team Insane starts -- to send DOCFIND request to the server
+	public void docFind(String filename, String originator, String toNode,String namespace)
+	{	
 		
-		System.out.println("to node --> " + h.getToNode() + "  " + h.hasToNode());
-		r.setHeader(h.build());
-
+		eye.Comm.Request req = buildRequest(filename, originator, toNode, eye.Comm.Header.Routing.DOCFIND, null, namespace);
+		System.out.println("DocFind-> " + req.getHeader().toString());
+		
 	    try {
 			// enqueue message
 			outbound.put(req);
@@ -203,30 +170,10 @@ public class ClientConnection {
 			logger.warn("Unable to deliver message, queuing");
 		}
 	}
-
-	//Team Insane starts -- to send DOCQUERY request to the server
-	public void docQuery(String filename, String originator, String toNode)
-	{	//virajh
-
-		Document.Builder d = eye.Comm.Document.newBuilder();
-		d.setDocName(filename);
-
-		// payload containing data
-		Request.Builder r = Request.newBuilder();
-		eye.Comm.Payload.Builder p = Payload.newBuilder();
-		p.setDoc(d.build());
-		r.setBody(p.build());
-
-		// header with routing info
-		eye.Comm.Header.Builder h = Header.newBuilder();
-		h.setOriginator(originator);
-		h.setTime(System.currentTimeMillis());
-		h.setRoutingId(eye.Comm.Header.Routing.DOCQUERY);
-		h.setToNode(toNode);
-		r.setHeader(h.build());
-
-		eye.Comm.Request req = r.build();
-
+	// Team Insane starts -- to send DOCQUERY request to the server
+	public void docQuery(String filename, String originator, String toNode,String namespace)
+	{	
+		eye.Comm.Request req = buildRequest(filename, originator, toNode, eye.Comm.Header.Routing.DOCQUERY, null,namespace);
 
 		try {
 			// enqueue message
@@ -235,9 +182,8 @@ public class ClientConnection {
 			logger.warn("Unable to deliver message, queuing");
 		}
 	}
-	
 	//Team Insane starts -- to put forward request message to the outbound queue of server
-	// in server to server communication, Server who is forwarding the request will act as client 
+	// in server to server communication, Server who is forwarding the request will act as client
 	public void forwardRequest(Request request){
 		try {
 			// enqueue message

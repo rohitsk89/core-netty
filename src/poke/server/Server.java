@@ -35,6 +35,7 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import poke.server.client.ForwardRequestManager;
 import poke.server.conf.JsonUtil;
 import poke.server.conf.NodeDesc;
 import poke.server.conf.ServerConf;
@@ -64,7 +65,7 @@ public class Server {
 	protected static final ChannelGroup allChannels = new DefaultChannelGroup("server");
 	protected static HashMap<Integer, Bootstrap> bootstrap = new HashMap<Integer, Bootstrap>();
 	protected ChannelFactory cf, mgmtCF;
-	protected ServerConf conf;
+	protected ServerConf conf,extconf;
 	protected HeartbeatManager hbMgr;
 
 	/**
@@ -102,6 +103,15 @@ public class Server {
 			br.read(raw);
 			conf = JsonUtil.decode(new String(raw), ServerConf.class);
 			ResourceFactory.initialize(conf);
+			
+			File externalConf = new File("./runtime/externalConf.conf");
+			raw = new byte[(int) externalConf.length()];
+			br = new BufferedInputStream(new FileInputStream(externalConf));
+			br.read(raw);
+			extconf = JsonUtil.decode(new String(raw), ServerConf.class);
+			// Team Insane: Initialize external conf
+			
+			
 		} catch (Exception e) {
 		}
 
@@ -183,7 +193,7 @@ public class Server {
 		// Bind and start to accept incoming connections.
 		Channel ch = bs.bind(new InetSocketAddress(port));
 		allChannels.add(ch);
-		
+
 		logger.info("Starting server, listening on port = " + port);
 	}
 
@@ -225,6 +235,9 @@ public class Server {
 		// manage hbMgr connections
 		HeartbeatConnector conn = HeartbeatConnector.getInstance();
 		conn.start();
+		
+		// Team Insane: Initialize ForwardRequestManager with conf. We need this to stand up edges.
+		ForwardRequestManager.setConf(conf);
 
 		logger.info("Server ready");
 		String host = "localhost";

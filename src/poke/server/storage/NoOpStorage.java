@@ -30,6 +30,12 @@ public class NoOpStorage implements Storage {
 	}
 
 	@Override
+	public boolean removeDocument(String namespace, long docId) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
 	public boolean updateDocument(String namespace, Document doc) {
 		// TODO Auto-generated method stub
 		return true;
@@ -75,11 +81,5 @@ public class NoOpStorage implements Storage {
 	public void release() {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public boolean removeDocument(String namespace, Document docId) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

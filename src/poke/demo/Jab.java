@@ -26,20 +26,23 @@ public class Jab {
 	public Jab(String tag) {
 		this.tag = tag;
 	}
-	//Team Insane starts
-	public void run() {
-		ClientConnection cc = ClientConnection.initConnection("localhost", 5570);
+
+	public void run(String arg) {
+		// Team Insane: Client code
+		ClientConnection cc = ClientConnection.initConnection("192.168.0.5", 5580);
 		ClientListener listener = new ClientPrintListener("jab demo");
 		cc.addListener(listener);
 
-		//for (int i = 0; i < 3; i++) {
-			count++;
-			System.out.println("tag ="+tag);
-			System.out.println("count ="+count);
-
-		cc.docFind("hello.txt", "JabClient", "zero");
-
-		//cc.docAdd("/home/virajh/hello.txt", "JabClient", "zero");
+		
+		if(arg.contentEquals("2"))
+			cc.docFind("README.txt", "JabClient", "one", "Team9");
+		else if(arg.contentEquals("3"))
+			cc.docRemove("README.txt", "JabClient", "one", "Team9");
+		else
+		{
+			cc.docAdd("/home/ranjan/hello.txt", "JabClient", "eight", "Team9");
+			//cc.docAdd("/home/ranjan/hello.txt", "JabClient", "one", "Team9");
+		}
 
 		//}
 	}
@@ -48,7 +51,10 @@ public class Jab {
 		try {
 			Jab jab = new Jab("jab");
 			System.out.println("\nJab.run called");
-			jab.run();
+			
+			String param="1";
+			
+			jab.run(param);
 
 			// we are running asynchronously
 			System.out.println("\nExiting in 5 seconds");

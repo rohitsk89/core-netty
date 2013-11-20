@@ -59,15 +59,19 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
 
 		return true;
 	}
-
+  
+	//Team insane: Process the incoming message
+	//save file at the client
 	public void handleMessage(eye.Comm.Response msg){
 		for (String id : listeners.keySet()) {
 			ClientListener cl = listeners.get(id);
-			//Team Insane starts -- To handle the response from server
+
+		//if(msg.getHeader().)
+			// TODO this may need to be delegated to a thread pool to allow
+			// async processing of replies
 			if(msg.getHeader().getRoutingId().getNumber() == 23){
 				System.out.println("message - " + msg.getHeader().getReplyMsg());
 			}
-			//Team Insane starts -- To save file received from the server
 			if(msg.getHeader().getRoutingId().getNumber() == 21){
 				System.out.println("Routing ID is 21");
 				if(msg.getHeader().getReplyCode().getNumber() == 1){
@@ -88,7 +92,6 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {
 					System.out.println("File not Found. Status -> " + msg.getHeader().getReplyCode());
 				}
 			}
-			//Team Insane starts -- to check if document is added on the server successfully
 			if(msg.getHeader().getRoutingId().getNumber() == 20){
 				if(msg.getHeader().getReplyCode().getNumber() == 1)
 					System.out.println("File saved succcessfully on server");

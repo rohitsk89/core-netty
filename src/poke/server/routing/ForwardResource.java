@@ -15,14 +15,17 @@
  */
 package poke.server.routing;
 
+
 import java.util.List;
 
+import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.CodedOutputStream;
 
 import poke.client.ClientConnection;
+import poke.server.client.ServerSideClient;
 import poke.server.conf.NodeDesc;
 import poke.server.conf.ServerConf;
 import poke.server.resources.Resource;
@@ -61,37 +64,53 @@ public class ForwardResource implements Resource {
 	public void setCfg(ServerConf cfg) {
 		this.cfg = cfg;
 	}
-	// Team insane start  -- Forward the resource to next node in configuration file.
+
 	@Override
-	public Response process(Request request) {
+	public Response process(Request request, Channel channel) {
+		// Team insane start  -- Forward the resource to next node in configuration file.
 		System.out.println("Inside ForwardReso");
-		String nextNode = determineForwardNode(request);
-			
+		
+		String nextNode = determineNextEdge(request, request.getHeader().getToNode());
+		//System.out.println(nextNode+"!!!");
+		Response reply = null;
 		if (nextNode != null) {
 			Request fwd = ResourceUtil.buildForwardMessage(request, cfg);
 			System.out.println("Next node -> " + nextNode);
-			System.out.println("Forward request: " + fwd);
+			
 			if (fwd==null)
 			{
 				Response.Builder rb = Response.newBuilder();
 				rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.SUCCESS, "duplicate message"));
 				PayloadReply.Builder pb = PayloadReply.newBuilder();
 				rb.setBody(pb.build());
-				Response reply = rb.build();
+				reply = rb.build();
 				return reply;
+			}
+			if(request.getHeader().hasRemainingHopCount())
+			{
+				long hopcnt = request.getHeader().getRemainingHopCount();
+				if(hopcnt <= 0 )
+				{
+					Response.Builder rb = Response.newBuilder();
+					rb.setHeader(ResourceUtil.buildHeaderFrom(request.getHeader(), ReplyStatus.FAILURE, "Out of hops"));
+					PayloadReply.Builder pb = PayloadReply.newBuilder();
+					rb.setBody(pb.build());
+					reply = rb.build();
+					return reply;
+				}
 			}
 			// enqueue message
 			String hostname = cfg.getNearest().getNode(nextNode).getHost();
 			int port = cfg.getNearest().getNode(nextNode).getPort();
+			String nodeId = cfg.getNearest().getNode(nextNode).getNodeId();
 			
-			ClientConnection cc = ClientConnection.initConnection(hostname, port);
-			cc.forwardRequest(fwd);
+			ServerSideClient cc = ServerSideClient.initConnection(nodeId, hostname, port);
+			System.out.println("Forwarding request " + hostname + ":" + port);	
+			cc.forwardRequest(fwd, channel);
 			
 			// TODO forward the request
-
-			return null;
 		} else {
-			Response reply = null;
+			reply = null;
 			// cannot forward the message - no edge or already traveled known
 			// edges
 
@@ -106,9 +125,8 @@ public class ForwardResource implements Resource {
 			rb.setBody(pb.build());
 
 			reply = rb.build();
-
-			return reply;
 		}
+		return reply;
 	}
 
 	/**
@@ -132,15 +150,16 @@ public class ForwardResource implements Resource {
 			// pick first nearest
 			NodeDesc nd = cfg.getNearest().getNearestNodes().values().iterator().next();
 			
-			//System.out.println(nd.getNodeId()+" <_<");
+			System.out.println(nd.getNodeId()+" <_<");
 			//System.out.println("below.");
 			return nd.getNodeId();
 		} else {
 			System.out.println("Inside else");
 			// if this server has already seen this message return null
 			for (RoutingPath rp : paths) {
-				//System.out.println(rp.getNode());
+				System.out.println("Inside Routing paths for " + rp.getNode());
 				for (NodeDesc nd : cfg.getNearest().getNearestNodes().values()) {
+					System.out.println(nd.getNodeId().toString());
 					if (!nd.getNodeId().equalsIgnoreCase(rp.getNode()))
 						return nd.getNodeId();
 				}
@@ -148,5 +167,25 @@ public class ForwardResource implements Resource {
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Find the nearest node that has not received the request.
+	 * 
+	 * TODO this should use the heartbeat to determine which node is active in
+	 * its list.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	private String determineNextEdge(Request request, String toNode) {
+		for (NodeDesc nd : cfg.getNearest().getNearestNodes().values()) {
+			System.out.println(nd.getNodeId().toString());
+			if (nd.getNodeId().equalsIgnoreCase(toNode))
+				return nd.getNodeId();
+		}
+		// check in external conf else
+		// Give the next node
+		return determineForwardNode(request);
 	}
 }

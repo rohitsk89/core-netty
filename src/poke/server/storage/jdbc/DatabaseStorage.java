@@ -296,7 +296,6 @@ public class DatabaseStorage implements Storage {
 	}
 
 	// Team insane start  -- remove document to the postgreSQL database
-	@Override
 	public boolean removeDocument(String namespace, Document docId) {
 		// TODO Auto-generated method stub
 			Connection conn = null;

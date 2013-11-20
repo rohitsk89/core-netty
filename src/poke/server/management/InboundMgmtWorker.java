@@ -95,9 +95,15 @@ public class InboundMgmtWorker extends Thread {
 							SocketAddress socka = msg.channel.getLocalAddress();
 							if (socka != null) {
 								InetSocketAddress isa = (InetSocketAddress) socka;
-								logger.info("NODEJOIN: " + isa.getHostName() + ", " + isa.getPort());
+								logger.info("NODEJOIN: " + isa.getHostName() + ", " + isa.getPort() + " ," + n.getNodeId());
 								HeartbeatManager.getInstance().addOutgoingChannel(n.getNodeId(), isa.getHostName(),
 										isa.getPort(), msg.channel, msg.sa);
+								
+								// Team: Add this node to ForwardRequestManager to handle Replication and request forward
+								// Adding here as we are now sure its active. As we dont have the port but just using nodeid from here
+								//logger.info("In NodeJoin, adding node to ForwardRequestmanager");
+								//ForwardRequestManager.addAvtiveNode(n.getNodeId());
+								// Node if comes as monitor here
 							}
 						} else
 							logger.warn(n.getNodeId() + " not writable");
